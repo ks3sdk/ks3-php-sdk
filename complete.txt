@@ -1,0 +1,48 @@
+GET Sevice
+GET Bucket
+GET Bucket location
+GET Bucket logging
+DELETE Bucket
+DELETE Bucket cors
+PUT Bucket(acp)
+PUT Bucket acl(acp)
+PUT Buclet cors
+PUT Bucket logging
+
+<?php
+array(
+	"Bucket"=>"",
+	"Key"=>"",
+	"ACL"=>"",
+	"ACP"=>?,
+	"Location"=?,
+	"CORS"=>array(
+			array(
+				"AllowedMethod"=>array("GET","PUT"),
+				"AllowedOrigin"=>array("http://ks3.ksyun.com"),
+				"AllowedHeader"=>array("*"),
+				"ExposeHeader"=>array("*"),
+				"MaxAgeSeconds"=>10
+			),
+			array(
+				"AllowedMethod"=>array("GET","PUT"),
+				"AllowedOrigin"=>array("http://ks3.ksyun.com"),
+				"AllowedHeader"=>array("*"),
+				"ExposeHeader"=>array("*"),
+				"MaxAgeSeconds"=>10
+			)
+		),
+	"BucketLogging"=>array(
+			"Enable":TRUE,
+			"TargetBucket":"",
+			"TargetPrefix":""
+		)
+	"ObjectMeta"=>array(
+		"Content-Type":"",
+		"Content-MD5":""
+		),
+	"Options"=>array(
+	             //query params
+	)
+)
+?>
