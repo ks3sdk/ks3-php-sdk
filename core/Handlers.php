@@ -112,11 +112,14 @@ class GetBucketLoggingHandler implements Handler{
 		$logging = array();
 		$xml = new SimpleXMLElement($response->body);
 		$loggingXml = $xml->LoggingEnabled;
-
-		$logging["Enable"] = FALSE;
-		foreach ($loggingXml->children() as $key => $value) {
-			$logging["Enable"] = TRUE;
-			$logging[$key] = $value->__toString();
+		if($loggingXml&&$loggingXml!==NULL)
+		{
+			foreach ($loggingXml->children() as $key => $value) {
+				$logging["Enable"] = TRUE;
+				$logging[$key] = $value->__toString();
+			}
+		}else{
+			$logging["Enable"] = FALSE;
 		}
 		return $logging;
 	}

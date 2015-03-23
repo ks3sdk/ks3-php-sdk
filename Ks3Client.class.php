@@ -6,8 +6,14 @@ date_default_timezone_set('Asia/Shanghai');
 //检测API路径
 if(!defined('KS3_API_PATH'))
 define('KS3_API_PATH', dirname(__FILE__));
-
+//是否使用VHOST
+define("VHOST",FALSE);
+//是否开启日志(写入日志文件)
 define("LOG",TRUE);
+//是否显示日志(直接输出日志)
+define("DISPLAY_LOG", TRUE);
+//定义日志目录(默认是该项目log下)
+define("LOG_PATH","");
 define("Author","lijunwei@kingsoft.com");
 define("Version","1.0");
 
@@ -182,7 +188,10 @@ class Ks3Client{
 		$signers = explode("->",$api["signer"]);
 		foreach ($signers as $key => $value) {
 			$signer = new $value();
-			$signer->sign($request,array("accessKey"=>$this->accessKey,"secretKey"=>$this->secretKey,"args"=>$args));
+			$log = $signer->sign($request,array("accessKey"=>$this->accessKey,"secretKey"=>$this->secretKey,"args"=>$args));
+			if(!empty($log)){
+				$msg.=$log."\r\n";
+			}
 		}
 
 		if($signer instanceof HeaderAuthSigner){
@@ -219,8 +228,7 @@ class Ks3Client{
 			$msg.="response headers->".serialize($httpRequest->get_response_header())."\r\n";
 			$msg.="response body->".$body."\r\n";
 			$msg.= "------------------Logging End-------------------------\r\n";
-			if(LOG)
-				$this->log->info($msg);
+			$this->log->info($msg);
 			$handlers = explode("->",$api["handler"]);
 			foreach ($handlers as $key => $value) {
 				$handler = new $value();
@@ -229,8 +237,7 @@ class Ks3Client{
 			return $data;
 		}else if($signer instanceof QueryAuthSigner){
 			$msg.= "------------------Logging End-------------------------\r\n";
-			if(LOG)
-				$this->log->info($msg);
+			$this->log->info($msg);
 			return $request->toUrl($this->endpoint);
 		}else{
 			//unexpected

@@ -1,4 +1,6 @@
 <?php
+require_once KS3_API_PATH.DIRECTORY_SEPARATOR."core".DIRECTORY_SEPARATOR."Utils.class.php";
+
 class Ks3Request{
 	private $bucket;
 	private $key;
@@ -47,15 +49,21 @@ class Ks3Request{
 		$this->queryParams[$key] = $value;
 	}
 	public function toUrl($endpoint){
-		$url = $this->scheme.$endpoint;
+		$url = $this->scheme;
 		$bucket = $this->bucket;
 		$key = $this->key;
 		$subResource = $this->subResource;
 		if(!empty($bucket)){
-			$url.="/".$bucket;
+			if(VHOST){
+				$url.=$bucket.".".$endpoint;
+			}else{
+				$url.=$endpoint."/".$bucket;
+			}
+		}else{
+			$url.=$endpoint;
 		}
 		if(!empty($key)){
-			$url.="/".$key;
+			$url.="/".Utils::encodeUrl($key);
 		}
 		$queryString = "";
 		if(!empty($subResource)){

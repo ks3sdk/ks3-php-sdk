@@ -53,9 +53,10 @@ class BucketLoggingBuilder{
 
 				if(!isset($logging["Enable"]))
 					throw new Ks3ClientException("bucket logging must provide Enable argument");
-				if(!isset($logging["TargetBucket"]))
-					throw new Ks3ClientException("bucket logging must provide TargetBucket argument");
+				
 				if($logging["Enable"]){
+					if(!isset($logging["TargetBucket"]))
+						throw new Ks3ClientException("bucket logging must provide TargetBucket argument");
 					$loggingConfig = $xml->addChild("LoggingEnabled");
 					foreach ($logging as $key => $value) {
 						if(in_array($key,Consts::$BucketLoggingElements)){

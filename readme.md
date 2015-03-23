@@ -20,10 +20,20 @@
 ### 3.1 获取秘钥
 1、开通KS3服务，[http://www.ksyun.com/user/register](http://www.ksyun.com/user/register) 注册账号  
 2、进入控制台, [http://ks3.ksyun.com/console.html#/setting](http://ks3.ksyun.com/console.html#/setting) 获取AccessKeyID 、AccessKeySecret
-### 3.2 初始化客户端
+### 3.2 日志配置
+在Ks3Client.php中
+//是否开启日志(写入日志文件)
+define("LOG",TRUE);
+//是否显示日志(直接输出日志)
+define("DISPLAY_LOG", TRUE);
+//定义日志目录(默认是该项目log下)
+define("LOG_PATH","");
+
+### 3.3 初始化客户端
 当以上全部完成之后用户便可初始化客户端进行操作了  
 
     $client = new Ks3Client("<您的AccessKeyID>","<您的AccessKeySecret>");
+
 ## 4 异常说明
 ### 4.1 Ks3ServiceException
 当抛出Ks3ServiceException时表示KS3服务端返回异常信息。Ks3ServiceException继承自RuntimeException 

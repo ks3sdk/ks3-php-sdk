@@ -109,7 +109,8 @@ class API{
 			"method"=>"PUT",
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
-			"signer"=>"ACLSigner->SuffixContentTypeSigner->ContentMD5Signer->ContentLengthSigner->ObjectMetaSigner->UserMetaSigner->HeaderAuthSigner",
+			//将ContentMD5Signer放在最后的原因是，ContentMD5需要根据Content-Length计算
+			"signer"=>"ACLSigner->SuffixContentTypeSigner->ContentLengthSigner->ObjectMetaSigner->ContentMD5Signer->UserMetaSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->UploadHandler",
 			"body"=>array("position"=>"Content")
 		),

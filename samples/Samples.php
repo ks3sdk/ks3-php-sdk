@@ -13,14 +13,14 @@ $client = new Ks3Client("2HITWMQXL2VBB3XMAEHQ","ilZQ9p/NHAK1dOYA/dTKKeIqT/t67rO6
 //print_r(bucketExists($client));
 //print_r(createBucket($client));
 //print_r(setBucketAcl($client));
-//print_r(setBucketCORS($client));
+print_r(setBucketCORS($client));
 //print_r(setBucketLogging($client));
 //print_r(deleteObject($client));
 //print_r(deleteObjects($client));
 //print_r(getObject($client));
 //print_r(getObjectAcl($client));
 //print_r(objectExists($client));
-print_r(getObjectMeta($client));
+//print_r(getObjectMeta($client));
 //print_r(setObjectAcl($client));
 //print_r(copyObject($client));
 //print_r(putObjectByFile($client));

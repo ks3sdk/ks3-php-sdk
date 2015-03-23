@@ -36,11 +36,18 @@ class SuffixContentTypeSigner implements Signer{
 }
 class HeaderAuthSigner implements Signer{
 	public function sign(Ks3Request $request,$args=array()){
+		$log = "stringToSing->\r\n";
 		$date = gmdate('D, d M Y H:i:s \G\M\T');
 		$request->addHeader(Headers::$Date, $date);
 
 		$ak = $args["accessKey"];
 		$sk = $args["secretKey"];
+		if(empty($ak)){
+			throw new Ks3ClientException("you should provide accessKey");
+		}
+		if(empty($sk)){
+			throw new Ks3ClientException("you should provide secretKey");
+		}
 		$authration = "KSS ";
 		$signList = array(
 			$request->method,
@@ -55,14 +62,17 @@ class HeaderAuthSigner implements Signer{
 		}
 		array_push($signList,$resource);
 		$stringToSign = join("\n",$signList);
+		$log.= $stringToSign;
 		$signature = base64_encode(hash_hmac('sha1', $stringToSign, $sk, true));
 
 		$authration.=$ak.":".$signature;
 		$request->addHeader(Headers::$Authorization, $authration);
+		return $log;
 	}
 }
 class QueryAuthSigner implements Signer{
 	public function sign(Ks3Request $request,$args=array()){
+		$log = "stringToSing->\r\n";
 		$ak = $args["accessKey"];
 		$sk = $args["secretKey"];
 		$expires = $args["args"]["Options"]["Expires"];
@@ -79,10 +89,12 @@ class QueryAuthSigner implements Signer{
 			);
 
 		$stringToSign = join("\n",$signList);
+		$log.= $stringToSign;
 		$signature = base64_encode(hash_hmac('sha1', $stringToSign, $sk, true));
 		$request->addQueryParams("KSSAccessKeyId",$ak);
 		$request->addQueryParams("Signature",$signature);
 		$request->addQueryParams("Expires",$expiresSencond);
+		return $log;
 	}
 }
 class ACLSigner implements Signer{
@@ -111,6 +123,14 @@ class ContentMD5Signer implements Signer{
 		if(empty($contentmd5)){
 			$body = $request->body;
 			if(!empty($body)){
+				$length = $request->getHeader(Headers::$ContentLength);
+				if(empty($length)){
+					if(isset($args["ObjectMeta"][Headers::$ContentLength]))
+						$length = $args["ObjectMeta"][Headers::$ContentLength];
+				}
+				if(!empty($length)){
+					$body = substr($body,0,$length);
+				}
 				$contentmd5 = Utils::hex_to_base64(md5($body));
 			}
 		}
