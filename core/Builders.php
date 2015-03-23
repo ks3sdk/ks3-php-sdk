@@ -68,4 +68,38 @@ class BucketLoggingBuilder{
 		}
 	}
 }
+class DeleteObjectsBuilder{
+	function build($args){
+		if(isset($args["DeleteKeys"])){
+			$keys = $args["DeleteKeys"];
+			$xml = new SimpleXmlElement('<Delete></Delete>');
+			if(is_array($keys)){
+				foreach ($keys as $key => $value) {
+					$object = $xml->addChild("Object");
+					$object->addChild("Key",$value);
+				}
+			}
+			return $xml->asXml();
+		}
+	}
+}
+class CompleteMultipartUploadBuilder{
+	function build($args){
+		if(isset($args["Parts"])){
+			$parts = $args["Parts"];
+			$xml = new SimpleXmlElement('<CompleteMultipartUpload></CompleteMultipartUpload>');
+			if(is_array($parts)){
+				foreach ($parts as $part) {
+					$partXml = $xml->addChild("Part");
+					foreach ($part as $key => $value) {
+						if(in_array($key,Consts::$PartsElement)){
+							$partXml->addChild($key,$value);
+						}
+					}
+				}
+			}
+			return $xml->asXml();
+		}
+	}
+}
 ?>

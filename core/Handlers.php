@@ -7,15 +7,16 @@ interface Handler{
 class ErrorResponseHandler implements Handler{
 	public function handle(ResponseCore $response){
 		$code = $response->status;
-		print_r( $response);
 		if(!$response->isOk()){
-			$xml = new SimpleXMLElement($response->body);
 			$exception = new Ks3ServiceException();
-			$exception ->requestId = $xml->RequestId;
-			$exception->errorCode = $xml->Code;
-			$exception->errorMessage=$xml->Message;
-			$exception->resource=$xml->Resource;
 			$exception->statusCode=$code;
+			if(!empty($response->body)){
+				$xml = new SimpleXMLElement($response->body);
+				$exception ->requestId = $xml->RequestId;
+				$exception->errorCode = $xml->Code;
+				$exception->errorMessage=$xml->Message;
+				$exception->resource=$xml->Resource;
+			}
 			throw $exception;
 		}else{
 			return $response;
@@ -47,7 +48,7 @@ class ListObjectsHandler implements Handler{
 		$result["Delimiter"]=$xml->Delimiter->__toString();
 		$result["MaxKeys"]=$xml->MaxKeys->__toString();
 		$result["IsTruncated"]=$xml->IsTruncated->__toString();
-
+		$result["NextMarker"]=$xml->NextMarker->__toString();
 		$contents = array();
 		foreach ($xml->Contents as $contentXml) {
 			$content = array();
@@ -76,6 +77,28 @@ class ListObjectsHandler implements Handler{
 		return $result;
 	}
 }
+class GetBucketCORSHandler implements Handler{
+	public function handle(ResponseCore $response){
+		$xml = new SimpleXMLElement($response->body);
+		$cors = array();
+		foreach ($xml->CORSRule as $rule) {
+			$acors = array();
+			foreach ($rule as $key => $value) {
+				if($key === "MaxAgeSeconds")
+				{
+					$acors[$key] = $value->__toString();
+				}else{
+					if(!isset($acors[$key])){
+						$acors[$key] = array();
+					}
+					array_push($acors[$key],$value->__toString());
+				}
+			}
+			array_push($cors,$acors);
+		}
+		return $cors;
+	}
+}
 class GetBucketLocationHandler implements Handler{
 	public function handle(ResponseCore $response){
 		$xml = new SimpleXMLElement($response->body);
@@ -98,12 +121,132 @@ class GetBucketLoggingHandler implements Handler{
 		return $logging;
 	}
 }
+class ObjectMetaHandler implements Handler{
+	public function handle(ResponseCore $response){
+		$ObjectMeta = array();
+		$UserMeta = array();
+		foreach ($response->header as $key => $value) {
+			if (substr(strtolower($key), 0, 10) === Consts::$UserMetaPrefix){
+				$UserMeta[$key]=$value;
+			}else if(isset(Consts::$ResponseObjectMeta[strtolower($key)])){
+				$ObjectMeta[Consts::$ResponseObjectMeta[strtolower($key)]]=$value;
+			}
+		}
+		$Meta = array(
+			"ObjectMeta"=>$ObjectMeta,
+			"UserMeta"=>$UserMeta
+			);
+		return $Meta;
+	}
+}
+class InitMultipartUploadHandler implements Handler{
+	public function handle(ResponseCore $response){
+		$upload = array();
+		$xml = new SimpleXMLElement($response->body);
+		foreach ($xml->children() as $key => $value) {
+			$upload[$key] = $value->__toString();
+		}
+		return $upload;
+	}
+}
+class ListPartsHandler implements Handler{
+	public function handle(ResponseCore $response){
+		$listParts = array();
+		$xml = new SimpleXMLElement($response->body);
+
+		$listParts["Bucket"]=$xml->Bucket->__toString();
+		$listParts["Key"]=$xml->Key->__toString();
+		$listParts["UploadId"]=$xml->UploadId->__toString();
+		$listParts["StorageClass"]=$xml->StorageClass->__toString();
+		$listParts["PartNumberMarker"]=$xml->PartNumberMarker->__toString();
+		$listParts["NextPartNumberMarker"]=$xml->NextPartNumberMarker->__toString();
+		$listParts["MaxParts"]=$xml->MaxParts->__toString();
+		$listParts["IsTruncated"]=$xml->IsTruncated->__toString();
+
+		$initer = array();
+		$owner = array();
+
+		foreach ($xml->Initiator->children() as $key => $value) {
+			$initer[$key] = $value->__toString();
+		}
+		foreach ($xml->Owner->children() as $key => $value) {
+			$owner[$key] = $value->__toString();
+		}
+		$listParts["Owner"] = $owner;
+		$listParts["Initiator"]=$initer;
+
+		$parts = array();
+		foreach ($xml->Part as $partxml) {
+			$part = array();
+			foreach ($partxml->children() as $key => $value) {
+				$part[$key] = $value->__toString();
+			}
+			array_push($parts,$part);
+		}
+		$listParts["Parts"] = $parts;
+		return $listParts;
+	}
+}
+class UploadHandler implements Handler{
+	public function handle(ResponseCore $response){
+		$Headers = array();
+		foreach ($response->header as $key => $value) {
+			if(isset(Consts::$UploadHandler[strtolower($key)])&&!empty($value)){
+				$Headers[Consts::$UploadHandler[strtolower($key)]]=$value;
+			}
+		}
+		return $Headers;
+	}
+}
+class GetAclHandler implements Handler{
+	public function handle(ResponseCore $response){
+		$hasread = FALSE;
+		$haswrite = FALSE;
+		$xml = new SimpleXMLElement($response->body);
+		$acl = $xml->AccessControlList;
+		foreach ($acl->children() as $grant) {
+			$permission = $grant->Permission->__toString();
+			$hasURI = FALSE;
+			$grantee = $grant->Grantee;
+			foreach ($grantee->children() as $key => $value) {
+				if($key === "URI"&&$value->__toString() === Consts::$Grantee_Group_All){
+					$hasURI = TRUE;
+				}
+			}
+			if($hasURI){
+				if($permission===Consts::$Permission_Read){
+					$hasread = TRUE;
+				}elseif($permission===Consts::$Permission_Write){
+					$haswrite = TRUE;
+				}
+			}
+		}
+		if($hasread&&$haswrite){
+			return "public-read-write";
+		}else{
+			if($hasread)
+				return "public-read";
+			else
+				return "private";
+		}
+	}
+}
 class BooleanHandler implements Handler{
 	public function handle(ResponseCore $response){
 		if(!$response->isOk()){
 			return TRUE;
 		}else{
 			return FALSE;
+		}
+	}
+}
+class ExistsHandler implements Handler{
+	public function handle(ResponseCore $response){
+		$status = $response->status;
+		if($status === 404){
+			return FALSE;
+		}else{
+			return TRUE;
 		}
 	}
 }

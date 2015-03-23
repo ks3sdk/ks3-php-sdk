@@ -9,6 +9,9 @@ class Ks3Request{
 	private $endpoint;
 	private $scheme;
 	private $body;
+	private $read_stream;
+	private $seek_position;
+	private $write_stream;
 
 	public function __set($property_name, $value){
 		$this->$property_name=$value;
@@ -42,6 +45,30 @@ class Ks3Request{
 	}
 	public function addQueryParams($key,$value){
 		$this->queryParams[$key] = $value;
+	}
+	public function toUrl($endpoint){
+		$url = $this->scheme.$endpoint;
+		$bucket = $this->bucket;
+		$key = $this->key;
+		$subResource = $this->subResource;
+		if(!empty($bucket)){
+			$url.="/".$bucket;
+		}
+		if(!empty($key)){
+			$url.="/".$key;
+		}
+		$queryString = "";
+		if(!empty($subResource)){
+			$queryString.="&".$subResource;
+		}
+		foreach ($this->queryParams as $key => $value) {
+			$queryString.="&".$key."=".rawurlencode($value);
+		}
+		$queryString = substr($queryString, 1);
+		if(!empty($queryString)){
+			$url.="?".$queryString;
+		}
+		return $url;
 	}
 }
 ?>
