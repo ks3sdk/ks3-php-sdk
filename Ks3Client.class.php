@@ -9,7 +9,7 @@ define('KS3_API_PATH', dirname(__FILE__));
 //是否使用VHOST
 define("VHOST",FALSE);
 //是否开启日志(写入日志文件)
-define("LOG",TRUE);
+define("LOG",FALSE);
 //是否显示日志(直接输出日志)
 define("DISPLAY_LOG", TRUE);
 //定义日志目录(默认是该项目log下)
@@ -72,6 +72,7 @@ class Ks3Client{
 	getBucketLocation,获取bucket地点配置
 	getBucketLogging,获取bucket日志配置
 	bucketExists,判断bucket是否存在
+	listMutipartUploads,罗列当前bucket下尚未结束的分块上传
 	putObjectByContent,上传文件
 	putObjectByFile,上传文件
 	setObjectAcl，设置object访问权限
@@ -88,6 +89,8 @@ class Ks3Client{
 	listParts，罗列已经上传的块
 	completeMultipartUpload，完成分块上传
 	generatePresignedUrl，生成文件外链
+	putAdp,添加异步数据处理任务
+	getAdp,查询异步数据处理任务
 	*/
 	public function __call($method,$args=array()){
 		$msg = "------------------Logging Start-------------------------\r\n";
@@ -110,10 +113,15 @@ class Ks3Client{
 			}
 		}
 		if($api["needObject"]){
-			if(empty($args["Key"])){
-				throw new Ks3ClientException($method." this api need object key");
+			$position = "Key";
+			//position主要为queryadp接口用的
+			if(isset($api["objectPostion"])){
+				$position = $api["objectPostion"];
+			}
+			if(empty($args[$position])){
+				throw new Ks3ClientException($method." this api need ".$position);
 			}else{
-				$key = $args["Key"];
+				$key = $args[$position];
 				if(Utils::is_gb2312($key)){
 					$key = iconv('GB2312', "UTF-8",$key);
 				}elseif(Utils::check_char($key,true)){
@@ -185,16 +193,19 @@ class Ks3Client{
 		//add ext headers
 		//TODO
 		//sign request
-		$signers = explode("->",$api["signer"]);
-		foreach ($signers as $key => $value) {
-			$signer = new $value();
-			$log = $signer->sign($request,array("accessKey"=>$this->accessKey,"secretKey"=>$this->secretKey,"args"=>$args));
-			if(!empty($log)){
-				$msg.=$log."\r\n";
+		$signer = NULL;
+		if(isset($api["signer"])){
+			$signers = explode("->",$api["signer"]);
+			foreach ($signers as $key => $value) {
+				$signer = new $value();
+				$log = $signer->sign($request,array("accessKey"=>$this->accessKey,"secretKey"=>$this->secretKey,"args"=>$args));
+				if(!empty($log)){
+					$msg.=$log."\r\n";
+				}
 			}
 		}
 
-		if($signer instanceof HeaderAuthSigner){
+		if($signer===NULL||!($signer instanceof QueryAuthSigner)){
 			$url = $request->toUrl($this->endpoint);
 			$httpRequest = new RequestCore($url);
 			$httpRequest->set_method($request->method);
@@ -235,14 +246,40 @@ class Ks3Client{
 				$data = $handler->handle($data);
 			}
 			return $data;
-		}else if($signer instanceof QueryAuthSigner){
+		}else{
 			$msg.= "------------------Logging End-------------------------\r\n";
 			$this->log->info($msg);
 			return $request->toUrl($this->endpoint);
-		}else{
-			//unexpected
 		}
-		
+	}
+	//用于生产表单上传时的签名信息
+	public function postObject($bucket ,$postFormData=array(),$unknowValueFormFiled=array(),$filename=NULL,$expire=18000){
+		$policy = array();
+
+		$expireTime = Utils::iso8601(time()+$expire);
+		$policy["expiration"] = $expireTime;
+		$postFormData["bucket"]=$bucket;
+		$conditions = array();
+		foreach ($postFormData as $key => $value) {
+			$condition = array();
+			$condition[$key] = str_replace("\${filename}",$filename, $value);
+			array_push($conditions,$condition);
+		}
+		foreach ($unknowValueFormFiled as $key => $value) {
+			$condition = array();
+			array_push($condition,"starts-with");
+			array_push($condition,"\$".$value);
+			array_push($condition,"");
+			array_push($conditions,$condition);
+		}
+		$policy["conditions"] = $conditions;
+		$json = json_encode($policy);
+		$signature = base64_encode(hash_hmac('sha1', base64_encode($json), $this->secretKey, true));
+		$result = array();
+		$result["Policy"] = base64_encode($json);
+		$result["Signature"] = $signature;
+		$result["KSSAccessKeyId"] = $this->accessKey;
+		return $result;
 	}
 }
 

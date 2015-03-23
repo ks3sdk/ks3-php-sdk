@@ -37,7 +37,21 @@ function testObject($client){
         ),
     	"UserMeta"=>array(//可以设置object的用户元数据，需要以x-kss-meta-开头
         	"x-kss-meta-test"=>"test"
-        )
+        ),
+      "Adp"=>array(
+          "NotifyURL"=>"http://10.4.2.38:19090/",
+          "Adps"=>array(
+          array(
+            "Command"=>"tag=avop&f=mp4&res=1280x720&vbr=1000k&abr=128k",
+            "Key"=>"野生动物-转码.3gp"
+           )
+         )
+      ),
+      "CallBack"=>array(
+          "Url"=>"http://10.4.2.38:19090/",
+          "BodyMagicVariables"=>array("bucket"=>"bucket","key"=>"key"),
+          "BodyVariables"=>array("name"=>"lijunwei")
+       )
     );
     $client->putObjectByFile($args);
     //Copy
@@ -69,12 +83,13 @@ function testObject($client){
     $args = array(
       "Bucket"=>$bucketName,
       "Key"=>$destinationKey,
+      "Range"=>"bytes=1-2",
        "WriteTo"=>$getfile //文件保存路径,必须提供。可以是resource
     );
     $client->getObject($args);
 
     $content = fgets(fopen($getfile, "r"));
-    assertEquals($content,"34567","content");
+    assertEquals($content,"45","content");
 
     //GET
     $args=array(

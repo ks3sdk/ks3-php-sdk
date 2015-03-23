@@ -34,5 +34,6 @@ class Consts {
 	static $Grantee_Group_All = "http://acs.ksyun.com/groups/global/AllUsers";
 	static $ResponseOverrides = array("response-expires","response-content-encoding","response-content-disposition",
 		"response-content-language","response-content-type","response-cache-control");
+	static $CallBackMagics = array("bucket","key","etag","objectSize","mimeType","createTime");
 }
 ?>

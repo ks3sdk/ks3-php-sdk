@@ -98,6 +98,15 @@ class API{
 			"signer"=>"DefaultContentTypeSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->GetBucketLoggingHandler"
 		),
+		"listMutipartUploads"=>array(
+			"method"=>"GET",
+			"needBucket"=>TRUE,
+			"needObject"=>FALSE,
+			"subResource"=>"uploads",
+			"queryParams"=>array("Options->max-uploads","Options->key-marker","Options->prefix","Options->upload-id-​marker","Options->delimiter"),
+			"signer"=>"DefaultContentTypeSigner->HeaderAuthSigner",
+			"handler"=>"ErrorResponseHandler->ListMutipartUploadsHandler"
+		),
 		"bucketExists"=>array(
 			"method"=>"HEAD",
 			"needBucket"=>TRUE,
@@ -110,7 +119,7 @@ class API{
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
 			//将ContentMD5Signer放在最后的原因是，ContentMD5需要根据Content-Length计算
-			"signer"=>"ACLSigner->SuffixContentTypeSigner->ContentLengthSigner->ObjectMetaSigner->ContentMD5Signer->UserMetaSigner->HeaderAuthSigner",
+			"signer"=>"ACLSigner->SuffixContentTypeSigner->ContentLengthSigner->ObjectMetaSigner->ContentMD5Signer->UserMetaSigner->AdpSigner->CallBackSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->UploadHandler",
 			"body"=>array("position"=>"Content")
 		),
@@ -118,7 +127,7 @@ class API{
 			"method"=>"PUT",
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
-			"signer"=>"ACLSigner->SuffixContentTypeSigner->ObjectMetaSigner->UserMetaSigner->StreamUploadSigner->HeaderAuthSigner",
+			"signer"=>"ACLSigner->SuffixContentTypeSigner->ObjectMetaSigner->UserMetaSigner->AdpSigner->CallBackSigner->StreamUploadSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->UploadHandler"
 		),
 		"setObjectAcl"=>array(
@@ -219,8 +228,8 @@ class API{
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
 			"queryParams"=>array("!Options->uploadId"),
-			"signer"=>"DefaultContentTypeSigner->ContentLengthSigner->HeaderAuthSigner",
-			"handler"=>"ErrorResponseHandler->BooleanHandler",
+			"signer"=>"DefaultContentTypeSigner->ContentLengthSigner->AdpSigner->CallBackSigner->HeaderAuthSigner",
+			"handler"=>"ErrorResponseHandler->UploadHandler",
 			"body"=>array("builder"=>"CompleteMultipartUploadBuilder")
 		),
 		"generatePresignedUrl"=>array(
@@ -230,6 +239,22 @@ class API{
 			"queryParams"=>array("!Options->Expires","Options->response-content-type","Options->response-content-encoding","Options->response-content-disposition",
 				"Options->response-content-language","Options->response-expires","Options->response-cache-control"),
 			"signer"=>"QueryAuthSigner",
+		),
+		"putAdp"=>array(
+			"method"=>"PUT",
+			"needBucket"=>TRUE,
+			"needObject"=>TRUE,
+			"subResource"=>"adp",
+			"signer"=>"DefaultContentTypeSigner->AdpSigner->HeaderAuthSigner",
+			"handler"=>"ErrorResponseHandler->UploadHandler"
+		),
+		"getAdp"=>array(
+			"method"=>"GET",
+			"needBucket"=>FALSE,
+			"needObject"=>TRUE,
+			"objectPostion"=>"TaskID",//专门为这个接口定义的属性
+			"subResource"=>"queryadp",
+			"handler"=>"ErrorResponseHandler->AdpHandler"
 		)
 	);
 }

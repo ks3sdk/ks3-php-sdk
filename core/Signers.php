@@ -226,7 +226,8 @@ class StreamUploadSigner implements Signer{
 			$isFile = FALSE;
 			if (!is_resource($content)){
 				$isFile = TRUE;
-				if(Utils::chk_chinese($content)){
+				//如果之前用户已经转化为GBK则不转换
+				if(Utils::chk_chinese($content)&&!Utils::check_char($content)){
 					$content = iconv('utf-8','gbk',$content);
 				}
 				if(!file_exists($content))
@@ -289,7 +290,8 @@ class GetObjectSigner{
 			if(is_resource($WriteTo)){
 				$request->write_stream = $WriteTo;
 			}else{
-				if(Utils::chk_chinese($WriteTo)){
+				//如果之前用户已经转化为GBK则不转换
+				if(Utils::chk_chinese($WriteTo)&&!Utils::check_char($WriteTo)){
 					$WriteTo = iconv('utf-8','gbk',$WriteTo);
 				}
 				$request->write_stream = fopen($WriteTo,"w");
@@ -303,17 +305,91 @@ class AdpSigner{
 	public function sign(Ks3Request $request,$args=array()){
 		$args = $args["args"];
 		if(isset($args["Adp"])){
-			$Adp = $args["Adp"];
-			if(is_resource($WriteTo)){
-				$request->write_stream = $WriteTo;
-			}else{
-				$request->write_stream = fopen($WriteTo,"w");
+			$AdpConf = $args["Adp"];
+			if(is_array($AdpConf)){
+				if(isset($AdpConf["NotifyURL"])){
+					$NotifyURL = $AdpConf["NotifyURL"];
+				}else{
+					throw new Ks3ClientException("adp should provide NotifyURL");
+				}
+				if(isset($AdpConf["Adps"])){
+					$Adps = $AdpConf["Adps"];
+				}else{
+					throw new Ks3ClientException("adp should provide Adps");
+				}
+				$AdpString = "";
+				foreach ($Adps as $Adp) {
+					if(is_array($Adp)){
+						if(!isset($Adp["Command"])){
+							throw new Ks3ClientException("command is needed in adp");
+						}
+						$command = $Adp["Command"];
+						$bucket = NULL;
+						$key = NULL;
+						if(isset($Adp["Bucket"])){
+							$bucket = $Adp["Bucket"];
+						}
+						if(isset($Adp["Key"])){
+							$key = $Adp["Key"];
+						}
+						$AdpString.=$command;
+						if(!(empty($bucket)&&empty($key))){
+							if(empty($bucket)){
+								$AdpString.="|tag=saveas&object=".base64_encode($key);
+							}elseif (empty($key)) {
+								$AdpString.="|tag=saveas&bucket=".$bucket;
+							}else{
+								$AdpString.="|tag=saveas&bucket=".$bucket."&"."object=".base64_encode($key);
+							}
+						}
+						$AdpString.=";";
+					}
+				}
+				if(!empty($AdpString)&&!empty($NotifyURL)){
+					$request->addHeader(Headers::$AsynchronousProcessingList,$AdpString);
+					$request->addHeader(Headers::$NotifyURL,$NotifyURL);
+				}
 			}
 		}
 	}
 }
 class CallBackSigner{
-
+	public function sign(Ks3Request $request,$args=array()){
+		$args = $args["args"];
+		if(isset($args["CallBack"])&&is_array($args["CallBack"])){
+			$CallBackConf = $args["CallBack"];
+			$url = NULL;
+			$body = NULL;
+			if(isset($CallBackConf["Url"])){
+				$url = $CallBackConf["Url"];
+			}
+			if(empty($url))
+				throw new Ks3ClientException("Url is needed in CallBack");
+			if(isset($CallBackConf["BodyMagicVariables"])){
+				if(is_array($CallBackConf["BodyMagicVariables"])){
+					$magics = $CallBackConf["BodyMagicVariables"];
+					foreach ($magics as $key => $value) {
+						if(in_array($value,Consts::$CallBackMagics))
+							$body.=$key."=\${".$value."}&";
+					}
+				}
+			}
+			if(isset($CallBackConf["BodyVariables"])){
+				if(is_array($CallBackConf["BodyVariables"])){
+					$variables = $CallBackConf["BodyVariables"];
+					foreach ($variables as $key => $value) {
+						$body.=$key."=\${kss-".$key."}&";
+						$request->addHeader("kss-".$key,$value);
+					}
+				}
+			}
+			if(!empty($body)){
+				$body=substr($body,0,strlen($body)-1);
+				$request->addHeader(Headers::$XKssCallbackBody,$body);
+			}
+			$request->addHeader(Headers::$XKssCallbackUrl,$url);
+		}
+	}
 }
 class AuthUtils{
 	public static function canonicalizedKssHeaders(Ks3Request $request){

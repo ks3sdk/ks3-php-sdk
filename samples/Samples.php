@@ -1,5 +1,6 @@
 <?php
 require_once "../Ks3Client.class.php";
+require_once "../core/Utils.class.php";
 
 $client = new Ks3Client("2HITWMQXL2VBB3XMAEHQ","ilZQ9p/NHAK1dOYA/dTKKeIqT/t67rO6V2PrXUNr");
 //print_r(listBuckets($client));
@@ -13,7 +14,7 @@ $client = new Ks3Client("2HITWMQXL2VBB3XMAEHQ","ilZQ9p/NHAK1dOYA/dTKKeIqT/t67rO6
 //print_r(bucketExists($client));
 //print_r(createBucket($client));
 //print_r(setBucketAcl($client));
-print_r(setBucketCORS($client));
+//print_r(setBucketCORS($client));
 //print_r(setBucketLogging($client));
 //print_r(deleteObject($client));
 //print_r(deleteObjects($client));
@@ -27,6 +28,10 @@ print_r(setBucketCORS($client));
 //print_r(multipartUpload($client));
 //print_r(abortMultipartUpload($client));
 //print_r(generatePresignedUrl($client));
+//print_r(putObjectWithAdpAndCallBack($client));
+//print_r(multipartUploadWithAdpAndCallBack($client));
+//print_r(putAdp($client));
+print_r(postObject($client));
 function listBuckets($client){
 	return $client->listBuckets();
 }
@@ -270,5 +275,138 @@ function generatePresignedUrl($client){
 			)
 		);
 	return $client->generatePresignedUrl($args);
+}
+function putObjectWithAdpAndCallBack($client){
+	$content = "D://野生动物.3gp";
+	$args = array(
+		"Bucket"=>"aaphp",
+		"Key"=>"野生动物.3gp",
+		"ACL"=>"public-read",
+		"Content"=>array(
+			"content"=>$content
+			),
+		"Adp"=>array(
+			"NotifyURL"=>"http://10.4.2.38:19090/",
+			"Adps"=>array(
+				array(
+					"Command"=>"tag=avop&f=mp4&res=1280x720&vbr=1000k&abr=128k",
+					"Key"=>"野生动物-转码.3gp"
+				)
+			)
+		),
+		"CallBack"=>array(
+			"Url"=>"http://10.4.2.38:19090/",
+			"BodyMagicVariables"=>array("bucket"=>"bucket","key"=>"key"),
+			"BodyVariables"=>array("name"=>"lijunwei")
+		)
+	);
+	return $client->putObjectByFile($args);
+}
+function  multipartUploadWithAdpAndCallBack($client){
+	$args = array(
+		"Bucket"=>"aaphp",
+		"Key"=>"multi.zip",
+		"UserMeta"=>array(
+			"x-kss-meta-test"=>"example"
+			),
+		"ObjectMeta"=>array(
+			"Content-Type"=>"text/plain"
+			)
+		);
+	$uploadid = $client->initMultipartUpload($args);
+	print_r($uploadid);
+	$uploadid = $uploadid["UploadId"];
+	echo $uploadid."\r\n";
+	//开始上传
+
+	$file = "D://野生动物.3gp";
+	if(Utils::chk_chinese($file)){
+		$file = iconv('utf-8','gbk',$file);
+	}
+	$partsize = 1024*1024*5;
+	$resource = fopen($file,"r");
+	$stat = fstat($resource);
+	$total = $stat["size"];
+	$count = (int)($total/$partsize+1);
+	echo $count."\r\n";
+	for($i = 0;$i < $count;$i++){
+		echo "upload".$i."\r\n";
+		$args=array(
+			"Bucket"=>"aaphp",
+			"Key"=>"multi.zip",
+			"Options"=>array(
+				"partNumber"=>$i+1,
+				"uploadId"=>$uploadid
+				),
+			"ObjectMeta"=>array(
+				"Content-Length"=>$partsize
+				),
+			"Content"=>array(
+				"content"=>$file,
+				"seek_position"=>$partsize*$i
+				)
+			);
+		$etag = $client->uploadPart($args);
+		print_r($etag);
+		$etag = $etag["ETag"];
+	}
+	$parts = $client->listParts(array("Bucket"=>"aaphp","Key"=>"multi.zip","Options"=>array("uploadId"=>$uploadid)));
+	print_r($parts);
+	//结束上传
+	$args=array(
+		"Bucket"=>"aaphp",
+		"Key"=>"multi.zip",
+		"Options"=>array("uploadId"=>$uploadid),
+		"Parts"=>$parts["Parts"],
+		"Adp"=>array(
+			"NotifyURL"=>"http://10.4.2.38:19090/",
+			"Adps"=>array(
+				array(
+					"Command"=>"tag=avop&f=mp4&res=1280x720&vbr=1000k&abr=128k",
+					"Key"=>"野生动物-转码.3gp"
+				)
+			)
+		),
+		"CallBack"=>array(
+			"Url"=>"http://10.4.2.38:19090/",
+			"BodyMagicVariables"=>array("bucket"=>"bucket","key"=>"key"),
+			"BodyVariables"=>array("name"=>"lijunwei")
+		)
+	);
+	$result = $client->completeMultipartUpload($args);
+	print_r($result);
+	$taskid = $result["TaskID"];
+	$task = $client->getAdp(array("TaskID"=>$taskid));
+	print_r($task);
+}
+function putAdp($client){
+	$args=array(
+		"Bucket"=>"aaphp",
+		"Key"=>"multi.zip",
+		"Adp"=>array(
+			"NotifyURL"=>"http://10.4.2.38:19090/",
+			"Adps"=>array(
+				array(
+					"Command"=>"tag=avop&f=mp4&res=1280x720&vbr=1000k&abr=128k",
+					"Key"=>"野生动物-转码.3gp"
+				)
+			)
+		)
+	);
+	$result = $client->putAdp($args);
+	print_r($result);
+	$taskid = $result["TaskID"];
+	$task = $client->getAdp(array("TaskID"=>$taskid));
+	print_r($task);
+}
+function postObject($client){
+
+	$postData = array(
+		"key"=>"~!@\\#$\%^&*()_+-=qw",
+		"acl"=>"public-read"
+		);
+	$unKnowData=array("122","334");
+
+	print_r($client->postObject("ksc-scm",$postData,$unKnowData));
 }
 ?>

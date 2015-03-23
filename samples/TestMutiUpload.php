@@ -62,13 +62,29 @@ function testObject($client){
 	}
 	$parts = $client->listParts(array("Bucket"=>$bucketName,"Key"=>$objectKey,"Options"=>array("uploadId"=>$uploadid)));
 	print_r($parts);
+	$uploads = $client->listMutipartUploads(array("Bucket"=>$bucketName,"Options"=>array("max-uploads"=>1)));
+	print_r($uploads);
 	//结束上传
 	$args=array(
 		"Bucket"=>$bucketName,
 		"Key"=>$objectKey,
 		"Options"=>array("uploadId"=>$uploadid),
-		"Parts"=>$parts["Parts"]
-		);
+		"Parts"=>$parts["Parts"],
+		"Adp"=>array(
+          	"NotifyURL"=>"http://10.4.2.38:19090/",
+          	"Adps"=>array(
+          	array(
+           	 	"Command"=>"tag=avop&f=mp4&res=1280x720&vbr=1000k&abr=128k",
+           		 "Key"=>"野生动物-转码.3gp"
+           	)
+      	  )
+         ),
+      	"CallBack"=>array(
+          	"Url"=>"http://10.4.2.38:19090/",
+          	"BodyMagicVariables"=>array("bucket"=>"bucket","key"=>"key"),
+          	"BodyVariables"=>array("name"=>"lijunwei")
+     	  )
+	);
 	$result = $client->completeMultipartUpload($args);
 	print_r($result);
 	//HEAD

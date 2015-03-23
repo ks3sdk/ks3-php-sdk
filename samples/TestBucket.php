@@ -15,7 +15,7 @@ function testBucket($client){
     if(!$client->bucketExists(array("Bucket"=>$bucketName))){
         $client->createBucket(array("Bucket"=>$bucketName));
     }
-
+    $client->listObjects(array("Bucket"=>$bucketName));
 	$client->setBucketAcl(array("Bucket"=>$bucketName,"ACL"=>"public-read"));
 
 	//ACL

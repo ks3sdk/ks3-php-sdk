@@ -192,5 +192,10 @@ class Utils{
 	    }
 	   return $gbk?TRUE:FALSE;
 	}
+	public static function iso8601($time=false) {
+    	if ($time === false) $time = time();
+   		$date = date('Y-m-d\TH:i:s\.Z', $time);
+   		return (substr($date, 0, strlen($date)-2).'Z');
+	}
 }
 ?>

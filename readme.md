@@ -299,6 +299,52 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     TRUE或者FALSE
 
 #### 5.2.9 List Mutipart Uploads
+列出当前bucket下未完成的分块上传
+参数格式:
+
+	$args=array(
+		"Bucket"=><目标bucket名称>,
+		"Options"=>array(
+			"max-uploads"=>1，//调节参数,支持key-marker、prefix、upload-id-​marker、delimiter,详细作用请参考KS3 API文档
+		)
+	)
+
+使用示例:
+
+    $client->listMutipartUploads($args);
+
+返回结果格式:
+
+	Array
+	(
+   		[Bucket] => phpsdktestlijunwei
+    	[KeyMarker] => 
+    	[UploadIdMarker] => 
+    	[NextKeyMarker] => 
+    	[NextUploadIdMarker] => 
+    	[MaxUploads] => 1
+    	[IsTruncated] => true //true表示返回的结果只是全部结果的部分
+    	[Uploads] => Array
+        (
+            [0] => Array
+            (
+                [Key] => dir/test/中文目录/@特殊字符!.txt
+                [Initiated] => 2015-03-23T11:22:45.451+08:00
+                [UploadId] => b05e21c69ff14386a66bbe9843976b17
+                [Initiator] => Array
+                (
+                    [ID] => 73398529
+                    [DisplayName] => 73398529
+                )
+                [Owner] => Array
+                (
+                    [ID] => 73398529
+                    [DisplayName] => 73398529
+                )
+                [StorageClass] => STANDARD
+            )
+        )
+	)
 
 #### 5.2.10 PUT Bucket
 创建一个bucket 
@@ -461,6 +507,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
         "Bucket"=>"<您的bucket名称>",
         "Key"=>"<key>"
         );
+
 ##### 5.3.5.1  判断object是否存在
 使用示例：
 
@@ -469,6 +516,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
 返回结果格式:
 
     TRUE或者FALSE
+
 ##### 5.3.5.1 获取object元数据
 使用示例:
 
@@ -492,6 +540,25 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     )
 
 #### 5.3.6 POST Object
+表单上传文件，用于获取KSSAccessKeyId、Policy和Signature
+使用示例:
+
+    $result = postObject(
+				$bucket ,//要上传的bucket
+				$postFormData=array(),//表单中能确定值得表单项, 如 array("key"=>"123.txt");
+				$unknowValueFormFiled=array(),//表单中不能确定值得表单项,如 array("random1","random2");
+				$filename=NULL,//如果没有使用${filename}占位符的话可以不提供要上传的文件名
+				$expire=18000//生成的签名过期时间,单位秒
+			);
+
+返回结果格式:
+
+	Array
+	(
+   		 [Policy] => eyJleHBpcmF0aW9uIjoiMjAxNS0wMy0yNFQwMTozMjo0Ny4yODhaIiwiY29uZGl0aW9ucyI6W3sia2V5IjoiZm9ybXVwbG9hZHRlc3RcL0BcdTRlMmRcdTY1ODcudHh0In0seyJzdWNjZXNzX2FjdGlvbl9yZWRpcmVjdCI6Imh0dHA6XC9cL2tzcy5rc3l1bi5jb21cL3BocHNka3Rlc3RsaWp1bndlaSJ9LHsiQ29udGVudC1UeXBlIjoidGV4dFwvaHRtbCJ9LHsiYnVja2V0IjoicGhwc2RrdGVzdGxpanVud2VpIn0sWyJzdGFydHMtd2l0aCIsIiRyYW5kb20iLCIiXV19
+    	 [Signature] => yQcB+sUpyjpwZu2JN9KYf2kXPCI=
+   		 [KSSAccessKeyId] => 1GL02rRYQxK8s7FQh8dV
+	)
 
 #### 5.3.7 PUT Object
 上传文件
@@ -514,6 +581,13 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
 使用示例:
 
     $client->putObjectByContent($args);
+
+返回结果格式:
+
+    Array
+    (
+        [ETag] => "????"
+    )
 
 ##### 5.3.7.2 通过文件上传
 参数格式:
@@ -539,7 +613,81 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
 使用示例:
 
     $client->putObjectByFile ($args);
+
+返回结果格式:
+
+    Array
+    (
+        [ETag] => "????"
+    )
    
+##### 5.3.7.3 上传文件时添加异步数据处理任务
+参数格式:
+在原有参数的基础上加上如下
+
+    "Adp"=>array(
+		"NotifyURL"=>"<处理完成后KS3服务通知的地址>",
+		"Adps"=>array(
+			array(
+				"Command"=>"tag=avop&f=mp4&res=1280x720&vbr=1000k&abr=128k",//处理命令。具体参考KS3 API文档数据处理，不需要在命令中写tag=saveas&..
+				"Bucket"=>"<处理完成后存在该bucket>",//需要拥有对该bucket写的权限.不提供的话将为数据所在的bucket
+				"Key"=>"<处理完成后存为该key>",//可以不提供，不提供的话将会是随机值。
+			)，
+			//......可以有多条命令
+		)
+	)
+
+比如：
+
+
+    $content = fopen("<文件路径>", "r");
+    $args = array(
+        "Bucket"=>"<您的bucket名称>",
+        "Key"=>"<key>",
+        "Content"=>array(//要上传的内容
+            "content"=>$content,//可以是文件路径或者resource
+            "seek_position"=>0//跳过文件开头?个字节
+        ),
+        "ACL"=>"public-read",//可以设置访问权限,合法值,private、public-read
+        "ObjectMeta"=>array(//设置object的元数据,可以设置"Cache-Control","Content-Disposition","Content-Encoding","Content-Length","Content-MD5","Content-Type","Expires"。当设置了Content-Length时，最后上传的为从seek_position开始向后Content-Length个字节的内容。当设置了Content-MD5时，系统会在服务端进行md5校验。
+            "Content-Type"=>"binay/ocet-stream",
+            "Content-Length"=>4
+        ),
+        "UserMeta"=>array(//可以设置object的用户元数据，需要以x-kss-meta-开头
+            "x-kss-meta-test"=>"test"
+        )
+        "Adp"=>array(
+			"NotifyURL"=>"<处理完成后KS3服务通知的地址>",
+			"Adps"=>array(
+				array(
+					"Command"=>"tag=avop&f=mp4&res=1280x720&vbr=1000k&abr=128k",//处理命令。具体参考KS3 API文档数据处理，不需要在命令中写tag=saveas&..
+					"Bucket"=>"<处理完成后存在该bucket>",//需要拥有对该bucket写的权限.不提供的话将为数据所在的bucket
+					"Key"=>"<处理完成后存为该key>",//可以不提供，不提供的话将会是随机值。
+				)，
+				//......可以有多条命令
+			)
+		)
+    );
+
+返回结果格式:
+
+    Array
+    (
+        [ETag] => "????"
+		[TaskID] => "????"
+    )
+
+##### 5.3.7.4 上传文件时添加回调
+参数格式:
+在原有参数的基础上加上如下
+
+    "CallBack"=>array(
+		"Url"=>"<KS3通知的URL>",
+		"BodyMagicVariables"=>array("bucket"=>"bucket","key"=>"key"),//魔法变量，key=>value中的value将被最后的实际值替换，比如"bucket"=>"bucket"替换为"bucket"=>"<上传的bucket>"。支持:"bucket","key","etag","objectSize","mimeType","createTime"
+		"BodyVariables"=>array("name"=>"lijunwei")//自定义KS3回调时需要在body中带的参数
+	)
+
+
 #### 5.3.8 PUT Object acl
 设置object的访问权限 
 参数格式: 
@@ -571,8 +719,47 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     $client->copyObject ($args);
 
 #### 5.3.10 PUT Adp
+添加异步数据处理：
+参数格式:
+
+    $args=array(
+		"Bucket"=>"<数据所在bucket>",
+		"Key"=>"<要处理的数据key>",
+		"Adp"=>array(
+			"NotifyURL"=>"<处理完成后KS3服务通知的地址>",
+			"Adps"=>array(
+				array(
+					"Command"=>"tag=avop&f=mp4&res=1280x720&vbr=1000k&abr=128k",//处理命令。具体参考KS3 API文档数据处理，不需要在命令中写tag=saveas&..
+					"Bucket"=>"<处理完成后存在该bucket>",//需要拥有对该bucket写的权限.不提供的话将为数据所在的bucket
+					"Key"=>"<处理完成后存为该key>",//可以不提供，不提供的话将会是随机值。
+				)，
+				//......可以有多条命令
+			)
+		)
+	);
+
+使用示例:
+
+    $client->putAdp($args);
+
+返回结果格式:
+
+    Array
+	(
+        [TaskID] => 00P7kNjRfJUv
+	)
+
+
 
 #### 5.3.11 GET Adp
+查询数据处理任务
+参数格式:
+    
+    $args = array("TaskID"=>"<TaskID>");
+
+使用示例:
+
+    $client->getAdp($args);
 
 #### 5.3.12 Initiate Multipart Upload
 初始化分块上传
@@ -706,7 +893,8 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
 
 
 #### 5.3.15 Complete Multipart Upload
-完成分开上传
+##### 5.3.15.1 基本方式
+完成分块上传
 参数格式:
 
     $args=array(
@@ -736,6 +924,42 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
 使用示例:
 
     $client->completeMultipartUpload($args);
+
+##### 5.3.15.2 添加异步数据处理任务
+参数格式:
+在原有参数的基础上加上如下
+
+    "Adp"=>array(
+		"NotifyURL"=>"<处理完成后KS3服务通知的地址>",
+		"Adps"=>array(
+			array(
+				"Command"=>"tag=avop&f=mp4&res=1280x720&vbr=1000k&abr=128k",//处理命令。具体参考KS3 API文档数据处理，不需要在命令中写tag=saveas&..
+				"Bucket"=>"<处理完成后存在该bucket>",//需要拥有对该bucket写的权限.不提供的话将为数据所在的bucket
+				"Key"=>"<处理完成后存为该key>",//可以不提供，不提供的话将会是随机值。
+			)，
+			//......可以有多条命令
+		)
+	)
+
+返回结果格式:
+
+    Array
+    (
+		[TaskID] => "????"
+    )
+
+##### 5.3.15.3 添加回调
+参数格式:
+在原有参数的基础上加上如下
+
+    "CallBack"=>array(
+		"Url"=>"<KS3通知的URL>",
+		"BodyMagicVariables"=>array("bucket"=>"bucket","key"=>"key"),//魔法变量，key=>value中的value将被最后的实际值替换，比如"bucket"=>"bucket"替换为"bucket"=>"<上传的bucket>"。支持:"bucket","key","etag","objectSize","mimeType","createTime"
+		"BodyVariables"=>array("name"=>"lijunwei")//自定义KS3回调时需要在body中带的参数
+	)
+
+
+
 
 #### 5.3.16 Abort Multipart Upload
 取消分块上传

@@ -10,5 +10,9 @@ class Headers{
 	static $ETag = "ETag";
 	static $TaskID = "TaskID";
 	static $Range = "Range";
+	static $AsynchronousProcessingList = "kss-async-process";
+	static $NotifyURL = "kss-notifyurl";
+	static $XKssCallbackUrl = "x-kss-callbackurl";
+	static $XKssCallbackBody = "x-kss-callbackbody";
 }
 ?>
