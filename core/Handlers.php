@@ -12,10 +12,10 @@ class ErrorResponseHandler implements Handler{
 			$exception->statusCode=$code;
 			if(!empty($response->body)){
 				$xml = new SimpleXMLElement($response->body);
-				$exception ->requestId = $xml->RequestId;
-				$exception->errorCode = $xml->Code;
-				$exception->errorMessage=$xml->Message;
-				$exception->resource=$xml->Resource;
+				$exception ->requestId = $xml->RequestId->__toString();
+				$exception->errorCode = $xml->Code->__toString();
+				$exception->errorMessage=$xml->Message->__toString();
+				$exception->resource=$xml->Resource->__toString();
 			}
 			throw $exception;
 		}else{

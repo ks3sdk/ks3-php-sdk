@@ -1,5 +1,6 @@
 <?php
 require_once "../Ks3Client.class.php";
+require_once "../core/Utils.class.php";
 
 $client = new Ks3Client("1GL02rRYQxK8s7FQh8dV","2IDjaPOpFfkq5Zf9K4tKu8k5AKApY8S8eKV1zsRl");
 testObject($client);
@@ -33,10 +34,7 @@ function testObject($client){
 	echo $uploadid."\r\n";
 	//开始上传
 	$partsize = 1024*1024*5;
-	$resource = fopen($file,"r");
-	$stat = fstat($resource);
-	$total = $stat["size"];
-	fclose($resource);
+	$total = Utils::getFileSize($file);
 	$count = (int)($total/$partsize+1);
 	echo $count."\r\n";
 	for($i = 0;$i < $count;$i++){

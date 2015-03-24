@@ -1,4 +1,6 @@
 <?php
+require_once KS3_API_PATH.DIRECTORY_SEPARATOR."exceptions".DIRECTORY_SEPARATOR."Exceptions.php";
+
 class Utils{
 	public static function encodeUrl($url,$path=TRUE){
 		$url = rawurlencode($url);
@@ -196,6 +198,24 @@ class Utils{
     	if ($time === false) $time = time();
    		$date = date('Y-m-d\TH:i:s\.Z', $time);
    		return (substr($date, 0, strlen($date)-2).'Z');
+	}
+	public static function getFileSize($path){
+		if(is_resource($path))
+		{
+			$resource = fopen($path,"r");
+			$stat = fstat($resource);
+			$size = $stat["size"];
+			if($size<0)
+				throw new Ks3ClientException("please use file path instead resource");
+			return $size;
+		}
+		if(!((strtoupper(substr(PHP_OS,0,3))=="WIN"))){//如果不是windows系统，尝试使用stat命令
+			$size=trim(`stat -c%s $path`);
+		}else{//如果是windows系统，尝试cmd命令
+			 $fs = new COM("Scripting.FileSystemObject");
+   			 $size=$fs->GetFile($path)->Size;
+		}
+		return $size;
 	}
 }
 ?>

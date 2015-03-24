@@ -597,7 +597,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
         "Bucket"=>"<您的bucket名称>",
         "Key"=>"<key>",
         "Content"=>array(//要上传的内容
-            "content"=>$content,//可以是文件路径或者resource
+            "content"=>$content,//可以是文件路径或者resource,如果文件大于2G，请提供文件路径
             "seek_position"=>0//跳过文件开头?个字节
             ),
         "ACL"=>"public-read",//可以设置访问权限,合法值,private、public-read
@@ -805,7 +805,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
             "Content-MD5"=>"<Content-MD5>"//可以提供该块的MD5值，将在服务端进行MD5校验
             ),
         "Content"=>array(
-            "content"=><file>,//要上传的文件路径,可以为resource
+            "content"=><file>,//要上传的文件路径,可以为resource,如果文件大于2G，请提供文件路径
             "seek_position"=>//跳过文件开头?个字节
             )
         );

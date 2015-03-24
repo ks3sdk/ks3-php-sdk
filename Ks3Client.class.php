@@ -9,7 +9,7 @@ define('KS3_API_PATH', dirname(__FILE__));
 //是否使用VHOST
 define("VHOST",FALSE);
 //是否开启日志(写入日志文件)
-define("LOG",FALSE);
+define("LOG",TRUE);
 //是否显示日志(直接输出日志)
 define("DISPLAY_LOG", TRUE);
 //定义日志目录(默认是该项目log下)
