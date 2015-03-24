@@ -1,0 +1,210 @@
+Tue, 24 Mar 2015 11:17:48 GMT INFO
+------------------Logging Start-------------------------
+method->bucketExists args->a:1:{i:0;a:1:{s:6:"Bucket";s:18:"phpsdktestlijunwei";}}
+stringToSing->
+HEAD
+
+application/xml
+Tue, 24 Mar 2015 11:17:47 GMT
+/phpsdktestlijunwei/
+request url->s:39:"http://kss.ksyun.com/phpsdktestlijunwei";
+request headers->a:3:{s:12:"Content-Type";s:15:"application/xml";s:4:"Date";s:29:"Tue, 24 Mar 2015 11:17:47 GMT";s:13:"Authorization";s:53:"KSS 1GL02rRYQxK8s7FQh8dV:vyflQ40rnKwdArqcH4pH9wrplLA=";}
+request body->
+request read stream length->
+request read stream seek position->
+response code->200
+response headers->a:7:{s:6:"server";s:7:"Tengine";s:4:"date";s:29:"Tue, 24 Mar 2015 11:17:48 GMT";s:14:"content-length";s:1:"0";s:10:"connection";s:10:"keep-alive";s:21:"x-application-context";s:11:"application";s:16:"x-kss-request-id";s:32:"41b2eda6106743fcb2849b2b7fab54ea";s:5:"_info";a:23:{s:3:"url";s:39:"http://kss.ksyun.com/phpsdktestlijunwei";s:12:"content_type";N;s:9:"http_code";i:200;s:11:"header_size";i:204;s:12:"request_size";i:322;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.311999999999999999555910790149937383830547332763671875;s:15:"namelookup_time";d:0.01600000000000000033306690738754696212708950042724609375;s:12:"connect_time";d:0.1559999999999999997779553950749686919152736663818359375;s:16:"pretransfer_time";d:0.1559999999999999997779553950749686919152736663818359375;s:11:"size_upload";d:0;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:0;s:23:"download_content_length";d:0;s:21:"upload_content_length";d:0;s:18:"starttransfer_time";d:0.311999999999999999555910790149937383830547332763671875;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:4:"HEAD";}}
+response body->
+------------------Logging End-------------------------
+
+Tue, 24 Mar 2015 11:17:48 GMT INFO
+------------------Logging Start-------------------------
+method->deleteObjects args->a:1:{i:0;a:2:{s:6:"Bucket";s:18:"phpsdktestlijunwei";s:10:"DeleteKeys";a:2:{i:0;s:40:"dir/test/中文目录/@特殊字符!.txt";i:1;s:4:"copy";}}}
+stringToSing->
+POST
+V0SmIW3Da8H27yYKQ0fZeg==
+application/xml
+Tue, 24 Mar 2015 11:17:48 GMT
+/phpsdktestlijunwei/?delete
+request url->s:46:"http://kss.ksyun.com/phpsdktestlijunwei?delete";
+request headers->a:5:{s:12:"Content-Type";s:15:"application/xml";s:11:"Content-MD5";s:24:"V0SmIW3Da8H27yYKQ0fZeg==";s:14:"Content-Length";i:180;s:4:"Date";s:29:"Tue, 24 Mar 2015 11:17:48 GMT";s:13:"Authorization";s:53:"KSS 1GL02rRYQxK8s7FQh8dV:RaUEW2pPeLDssLKUAIDjUAvwqpc=";}
+request body-><?xml version="1.0"?>
+<Delete><Object><Key>dir/test/&#x4E2D;&#x6587;&#x76EE;&#x5F55;/@&#x7279;&#x6B8A;&#x5B57;&#x7B26;!.txt</Key></Object><Object><Key>copy</Key></Object></Delete>
+
+request read stream length->180
+request read stream seek position->
+response code->200
+response headers->a:8:{s:6:"server";s:7:"Tengine";s:4:"date";s:29:"Tue, 24 Mar 2015 11:17:48 GMT";s:12:"content-type";s:15:"application/xml";s:17:"transfer-encoding";s:7:"chunked";s:10:"connection";s:10:"keep-alive";s:21:"x-application-context";s:11:"application";s:16:"x-kss-request-id";s:32:"0fff380fdba14f8a8186bb10aed1ff7c";s:5:"_info";a:23:{s:3:"url";s:46:"http://kss.ksyun.com/phpsdktestlijunwei?delete";s:12:"content_type";s:15:"application/xml";s:9:"http_code";i:200;s:11:"header_size";i:244;s:12:"request_size";i:576;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.3589999999999999857891452847979962825775146484375;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.20299999999999995825561427409411408007144927978515625;s:16:"pretransfer_time";d:0.20299999999999995825561427409411408007144927978515625;s:11:"size_upload";d:180;s:13:"size_download";d:118;s:14:"speed_download";d:328;s:12:"speed_upload";d:501;s:23:"download_content_length";d:-1;s:21:"upload_content_length";d:180;s:18:"starttransfer_time";d:0.3589999999999999857891452847979962825775146484375;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:4:"POST";}}
+response body-><?xml version="1.0" encoding="UTF-8" standalone="yes"?><DeleteResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"/>
+------------------Logging End-------------------------
+
+Tue, 24 Mar 2015 11:17:49 GMT INFO
+------------------Logging Start-------------------------
+method->putObjectByFile args->a:1:{i:0;a:8:{s:6:"Bucket";s:18:"phpsdktestlijunwei";s:3:"Key";s:40:"dir/test/中文目录/@特殊字符!.txt";s:7:"Content";a:2:{s:7:"content";s:10:"D://phpput";s:13:"seek_position";i:2;}s:3:"ACL";s:11:"public-read";s:10:"ObjectMeta";a:6:{s:12:"Content-Type";s:17:"binay/ocet-stream";s:14:"Content-Length";s:1:"4";s:13:"Cache-Control";s:8:"no-cache";s:19:"Content-Disposition";s:11:"attachment;";s:16:"Content-Encoding";s:4:"gzip";s:7:"Expires";s:29:"Mon, 23 Mar 9999 05:23:22 GMT";}s:8:"UserMeta";a:1:{s:15:"x-kss-meta-test";s:4:"test";}s:3:"Adp";a:2:{s:9:"NotifyURL";s:23:"http://10.4.2.38:19090/";s:4:"Adps";a:1:{i:0;a:2:{s:7:"Command";s:46:"tag=avop&f=mp4&res=1280x720&vbr=1000k&abr=128k";s:3:"Key";s:23:"野生动物-转码.3gp";}}}s:8:"CallBack";a:3:{s:3:"Url";s:23:"http://10.4.2.38:19090/";s:18:"BodyMagicVariables";a:2:{s:6:"bucket";s:6:"bucket";s:3:"key";s:3:"key";}s:13:"BodyVariables";a:1:{s:4:"name";s:8:"lijunwei";}}}}
+stringToSing->
+PUT
+
+binay/ocet-stream
+Tue, 24 Mar 2015 11:17:48 GMT
+x-kss-acl:public-read
+x-kss-callbackbody:bucket=${bucket}&key=${key}&name=${kss-name}
+x-kss-callbackurl:http://10.4.2.38:19090/
+x-kss-meta-test:test
+/phpsdktestlijunwei/dir/test/%E4%B8%AD%E6%96%87%E7%9B%AE%E5%BD%95/%40%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%21.txt
+request url->s:132:"http://kss.ksyun.com/phpsdktestlijunwei/dir/test/%E4%B8%AD%E6%96%87%E7%9B%AE%E5%BD%95/%40%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%21.txt";
+request headers->a:15:{s:9:"x-kss-acl";s:11:"public-read";s:12:"Content-Type";s:17:"binay/ocet-stream";s:14:"Content-Length";s:1:"4";s:13:"Cache-Control";s:8:"no-cache";s:19:"Content-Disposition";s:11:"attachment;";s:16:"Content-Encoding";s:4:"gzip";s:7:"Expires";s:29:"Mon, 23 Mar 9999 05:23:22 GMT";s:15:"x-kss-meta-test";s:4:"test";s:17:"kss-async-process";s:98:"tag=avop&f=mp4&res=1280x720&vbr=1000k&abr=128k|tag=saveas&object=6YeO55Sf5Yqo54mpLei9rOeggS4zZ3A=;";s:13:"kss-notifyurl";s:23:"http://10.4.2.38:19090/";s:8:"kss-name";s:8:"lijunwei";s:18:"x-kss-callbackbody";s:44:"bucket=${bucket}&key=${key}&name=${kss-name}";s:17:"x-kss-callbackurl";s:23:"http://10.4.2.38:19090/";s:4:"Date";s:29:"Tue, 24 Mar 2015 11:17:48 GMT";s:13:"Authorization";s:53:"KSS 1GL02rRYQxK8s7FQh8dV:VawCA79a1miWvfEn2IBgRPGQYPM=";}
+request body->
+request read stream length->4
+request read stream seek position->2
+response code->200
+response headers->a:9:{s:6:"server";s:7:"Tengine";s:4:"date";s:29:"Tue, 24 Mar 2015 11:17:49 GMT";s:14:"content-length";s:1:"0";s:10:"connection";s:10:"keep-alive";s:21:"x-application-context";s:11:"application";s:16:"x-kss-request-id";s:32:"47536569237b407c9a5d10e24af1000b";s:6:"taskid";s:12:"00P7qaQ5dXRO";s:4:"etag";s:34:""def7924e3199be5e18060bb3e1d547a7"";s:5:"_info";a:23:{s:3:"url";s:132:"http://kss.ksyun.com/phpsdktestlijunwei/dir/test/%E4%B8%AD%E6%96%87%E7%9B%AE%E5%BD%95/%40%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%21.txt";s:12:"content_type";N;s:9:"http_code";i:200;s:11:"header_size";i:293;s:12:"request_size";i:1009;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.51500000000000001332267629550187848508358001708984375;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.14000000000000001332267629550187848508358001708984375;s:16:"pretransfer_time";d:0.14000000000000001332267629550187848508358001708984375;s:11:"size_upload";d:4;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:7;s:23:"download_content_length";d:0;s:21:"upload_content_length";d:4;s:18:"starttransfer_time";d:0.28100000000000002753353101070388220250606536865234375;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"PUT";}}
+response body->
+------------------Logging End-------------------------
+
+Tue, 24 Mar 2015 11:17:49 GMT INFO
+------------------Logging Start-------------------------
+method->copyObject args->a:1:{i:0;a:3:{s:6:"Bucket";s:18:"phpsdktestlijunwei";s:3:"Key";s:4:"copy";s:10:"CopySource";a:2:{s:6:"Bucket";s:18:"phpsdktestlijunwei";s:3:"Key";s:40:"dir/test/中文目录/@特殊字符!.txt";}}}
+stringToSing->
+PUT
+
+application/xml
+Tue, 24 Mar 2015 11:17:49 GMT
+x-kss-copy-source:/phpsdktestlijunwei/dir/test/%E4%B8%AD%E6%96%87%E7%9B%AE%E5%BD%95/%40%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%21.txt
+/phpsdktestlijunwei/copy
+request url->s:44:"http://kss.ksyun.com/phpsdktestlijunwei/copy";
+request headers->a:4:{s:17:"x-kss-copy-source";s:112:"/phpsdktestlijunwei/dir/test/%E4%B8%AD%E6%96%87%E7%9B%AE%E5%BD%95/%40%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%21.txt";s:12:"Content-Type";s:15:"application/xml";s:4:"Date";s:29:"Tue, 24 Mar 2015 11:17:49 GMT";s:13:"Authorization";s:53:"KSS 1GL02rRYQxK8s7FQh8dV:HE/n++lT/D4ax7Uj/89kCznmnx8=";}
+request body->
+request read stream length->
+request read stream seek position->
+response code->200
+response headers->a:9:{s:6:"server";s:7:"Tengine";s:4:"date";s:29:"Tue, 24 Mar 2015 11:17:49 GMT";s:12:"content-type";s:15:"application/xml";s:17:"transfer-encoding";s:7:"chunked";s:10:"connection";s:10:"keep-alive";s:21:"x-application-context";s:11:"application";s:16:"x-kss-request-id";s:32:"033a22730392405cb564b4f82898f013";s:7:"taskid:";s:0:"";s:5:"_info";a:23:{s:3:"url";s:44:"http://kss.ksyun.com/phpsdktestlijunwei/copy";s:12:"content_type";s:15:"application/xml";s:9:"http_code";i:200;s:11:"header_size";i:254;s:12:"request_size";i:483;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.3120000000000000550670620214077644050121307373046875;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.1559999999999999997779553950749686919152736663818359375;s:16:"pretransfer_time";d:0.1559999999999999997779553950749686919152736663818359375;s:11:"size_upload";d:0;s:13:"size_download";d:240;s:14:"speed_download";d:769;s:12:"speed_upload";d:0;s:23:"download_content_length";d:-1;s:21:"upload_content_length";d:0;s:18:"starttransfer_time";d:0.3120000000000000550670620214077644050121307373046875;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"PUT";}}
+response body-><?xml version="1.0" encoding="UTF-8" standalone="yes"?><CopyObjectResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><LastModified>2015-03-24T11:17:49.341Z</LastModified><ETag>"def7924e3199be5e18060bb3e1d547a7"</ETag></CopyObjectResult>
+------------------Logging End-------------------------
+
+Tue, 24 Mar 2015 11:17:49 GMT INFO
+------------------Logging Start-------------------------
+method->objectExists args->a:1:{i:0;a:2:{s:6:"Bucket";s:18:"phpsdktestlijunwei";s:3:"Key";s:40:"dir/test/中文目录/@特殊字符!.txt";}}
+stringToSing->
+HEAD
+
+application/xml
+Tue, 24 Mar 2015 11:17:49 GMT
+/phpsdktestlijunwei/dir/test/%E4%B8%AD%E6%96%87%E7%9B%AE%E5%BD%95/%40%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%21.txt
+request url->s:132:"http://kss.ksyun.com/phpsdktestlijunwei/dir/test/%E4%B8%AD%E6%96%87%E7%9B%AE%E5%BD%95/%40%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%21.txt";
+request headers->a:3:{s:12:"Content-Type";s:15:"application/xml";s:4:"Date";s:29:"Tue, 24 Mar 2015 11:17:49 GMT";s:13:"Authorization";s:53:"KSS 1GL02rRYQxK8s7FQh8dV:Tj1vNNXpLXrDa9t6IK5x30Xx1v0=";}
+request body->
+request read stream length->
+request read stream seek position->
+response code->200
+response headers->a:15:{s:6:"server";s:7:"Tengine";s:4:"date";s:29:"Tue, 24 Mar 2015 11:17:49 GMT";s:12:"content-type";s:17:"binay/ocet-stream";s:14:"content-length";s:1:"4";s:10:"connection";s:10:"keep-alive";s:21:"x-application-context";s:11:"application";s:16:"x-kss-request-id";s:32:"9b3db3cf5c984f74af09b417b5b2009d";s:7:"expires";s:29:"Mon, 23 Mar 9999 05:23:22 GMT";s:19:"content-disposition";s:11:"attachment;";s:16:"content-encoding";s:4:"gzip";s:13:"cache-control";s:8:"no-cache";s:15:"x-kss-meta-test";s:4:"test";s:4:"etag";s:34:""def7924e3199be5e18060bb3e1d547a7"";s:13:"last-modified";s:29:"Tue, 24 Mar 2015 11:17:48 GMT";s:5:"_info";a:23:{s:3:"url";s:132:"http://kss.ksyun.com/phpsdktestlijunwei/dir/test/%E4%B8%AD%E6%96%87%E7%9B%AE%E5%BD%95/%40%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%21.txt";s:12:"content_type";s:17:"binay/ocet-stream";s:9:"http_code";i:200;s:11:"header_size";i:471;s:12:"request_size";i:508;s:8:"filetime";i:1427195868;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.311999999999999999555910790149937383830547332763671875;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.1559999999999999997779553950749686919152736663818359375;s:16:"pretransfer_time";d:0.1559999999999999997779553950749686919152736663818359375;s:11:"size_upload";d:0;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:0;s:23:"download_content_length";d:4;s:21:"upload_content_length";d:0;s:18:"starttransfer_time";d:0.311999999999999999555910790149937383830547332763671875;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:4:"HEAD";}}
+response body->
+------------------Logging End-------------------------
+
+Tue, 24 Mar 2015 11:17:49 GMT INFO
+------------------Logging Start-------------------------
+method->getObjectMeta args->a:1:{i:0;a:2:{s:6:"Bucket";s:18:"phpsdktestlijunwei";s:3:"Key";s:40:"dir/test/中文目录/@特殊字符!.txt";}}
+stringToSing->
+HEAD
+
+application/xml
+Tue, 24 Mar 2015 11:17:49 GMT
+/phpsdktestlijunwei/dir/test/%E4%B8%AD%E6%96%87%E7%9B%AE%E5%BD%95/%40%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%21.txt
+request url->s:132:"http://kss.ksyun.com/phpsdktestlijunwei/dir/test/%E4%B8%AD%E6%96%87%E7%9B%AE%E5%BD%95/%40%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%21.txt";
+request headers->a:3:{s:12:"Content-Type";s:15:"application/xml";s:4:"Date";s:29:"Tue, 24 Mar 2015 11:17:49 GMT";s:13:"Authorization";s:53:"KSS 1GL02rRYQxK8s7FQh8dV:Tj1vNNXpLXrDa9t6IK5x30Xx1v0=";}
+request body->
+request read stream length->
+request read stream seek position->
+response code->200
+response headers->a:15:{s:6:"server";s:7:"Tengine";s:4:"date";s:29:"Tue, 24 Mar 2015 11:17:49 GMT";s:12:"content-type";s:17:"binay/ocet-stream";s:14:"content-length";s:1:"4";s:10:"connection";s:10:"keep-alive";s:21:"x-application-context";s:11:"application";s:16:"x-kss-request-id";s:32:"91750eefeb6c4ffe8a8efb48540bc77e";s:7:"expires";s:29:"Mon, 23 Mar 9999 05:23:22 GMT";s:19:"content-disposition";s:11:"attachment;";s:16:"content-encoding";s:4:"gzip";s:13:"cache-control";s:8:"no-cache";s:15:"x-kss-meta-test";s:4:"test";s:4:"etag";s:34:""def7924e3199be5e18060bb3e1d547a7"";s:13:"last-modified";s:29:"Tue, 24 Mar 2015 11:17:48 GMT";s:5:"_info";a:23:{s:3:"url";s:132:"http://kss.ksyun.com/phpsdktestlijunwei/dir/test/%E4%B8%AD%E6%96%87%E7%9B%AE%E5%BD%95/%40%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%21.txt";s:12:"content_type";s:17:"binay/ocet-stream";s:9:"http_code";i:200;s:11:"header_size";i:471;s:12:"request_size";i:508;s:8:"filetime";i:1427195868;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.28100000000000002753353101070388220250606536865234375;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.14000000000000001332267629550187848508358001708984375;s:16:"pretransfer_time";d:0.14000000000000001332267629550187848508358001708984375;s:11:"size_upload";d:0;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:0;s:23:"download_content_length";d:4;s:21:"upload_content_length";d:0;s:18:"starttransfer_time";d:0.28100000000000002753353101070388220250606536865234375;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:4:"HEAD";}}
+response body->
+------------------Logging End-------------------------
+
+Tue, 24 Mar 2015 11:17:50 GMT INFO
+------------------Logging Start-------------------------
+method->getObject args->a:1:{i:0;a:4:{s:6:"Bucket";s:18:"phpsdktestlijunwei";s:3:"Key";s:4:"copy";s:5:"Range";s:9:"bytes=1-2";s:7:"WriteTo";s:10:"D://phpget";}}
+stringToSing->
+GET
+
+application/xml
+Tue, 24 Mar 2015 11:17:49 GMT
+/phpsdktestlijunwei/copy
+request url->s:44:"http://kss.ksyun.com/phpsdktestlijunwei/copy";
+request headers->a:4:{s:12:"Content-Type";s:15:"application/xml";s:5:"Range";s:9:"bytes=1-2";s:4:"Date";s:29:"Tue, 24 Mar 2015 11:17:49 GMT";s:13:"Authorization";s:53:"KSS 1GL02rRYQxK8s7FQh8dV:ObVfrtfFsL2kepIyCuljTXP8sHs=";}
+request body->
+request read stream length->
+request read stream seek position->
+response code->206
+response headers->a:1:{s:5:"_info";a:23:{s:3:"url";s:44:"http://kss.ksyun.com/phpsdktestlijunwei/copy";s:12:"content_type";s:17:"binay/ocet-stream";s:9:"http_code";i:206;s:11:"header_size";i:411;s:12:"request_size";i:349;s:8:"filetime";i:1427195869;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.295999999999999985345056074947933666408061981201171875;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.1559999999999999997779553950749686919152736663818359375;s:16:"pretransfer_time";d:0.1559999999999999997779553950749686919152736663818359375;s:11:"size_upload";d:0;s:13:"size_download";d:2;s:14:"speed_download";d:6;s:12:"speed_upload";d:0;s:23:"download_content_length";d:2;s:21:"upload_content_length";d:0;s:18:"starttransfer_time";d:0.295999999999999985345056074947933666408061981201171875;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"GET";}}
+response body->
+------------------Logging End-------------------------
+
+Tue, 24 Mar 2015 11:17:50 GMT INFO
+------------------Logging Start-------------------------
+method->generatePresignedUrl args->a:1:{i:0;a:3:{s:6:"Bucket";s:18:"phpsdktestlijunwei";s:3:"Key";s:40:"dir/test/中文目录/@特殊字符!.txt";s:7:"Options";a:2:{s:7:"Expires";i:864000;s:21:"response-content-type";s:15:"application/xml";}}}
+stringToSing->
+GET
+
+
+1428059870
+/phpsdktestlijunwei/dir/test/%E4%B8%AD%E6%96%87%E7%9B%AE%E5%BD%95/%40%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%21.txt?response-content-type=application/xml
+------------------Logging End-------------------------
+
+Tue, 24 Mar 2015 11:17:50 GMT INFO
+------------------Logging Start-------------------------
+method->deleteObjects args->a:1:{i:0;a:2:{s:6:"Bucket";s:18:"phpsdktestlijunwei";s:10:"DeleteKeys";a:2:{i:0;s:40:"dir/test/中文目录/@特殊字符!.txt";i:1;s:4:"copy";}}}
+stringToSing->
+POST
+V0SmIW3Da8H27yYKQ0fZeg==
+application/xml
+Tue, 24 Mar 2015 11:17:50 GMT
+/phpsdktestlijunwei/?delete
+request url->s:46:"http://kss.ksyun.com/phpsdktestlijunwei?delete";
+request headers->a:5:{s:12:"Content-Type";s:15:"application/xml";s:11:"Content-MD5";s:24:"V0SmIW3Da8H27yYKQ0fZeg==";s:14:"Content-Length";i:180;s:4:"Date";s:29:"Tue, 24 Mar 2015 11:17:50 GMT";s:13:"Authorization";s:53:"KSS 1GL02rRYQxK8s7FQh8dV:EKGv7HkBzLbSme2wKg2/chmQpXA=";}
+request body-><?xml version="1.0"?>
+<Delete><Object><Key>dir/test/&#x4E2D;&#x6587;&#x76EE;&#x5F55;/@&#x7279;&#x6B8A;&#x5B57;&#x7B26;!.txt</Key></Object><Object><Key>copy</Key></Object></Delete>
+
+request read stream length->180
+request read stream seek position->
+response code->200
+response headers->a:8:{s:6:"server";s:7:"Tengine";s:4:"date";s:29:"Tue, 24 Mar 2015 11:17:50 GMT";s:12:"content-type";s:15:"application/xml";s:17:"transfer-encoding";s:7:"chunked";s:10:"connection";s:10:"keep-alive";s:21:"x-application-context";s:11:"application";s:16:"x-kss-request-id";s:32:"badc05fa3f67473ab6406d1ab70ba063";s:5:"_info";a:23:{s:3:"url";s:46:"http://kss.ksyun.com/phpsdktestlijunwei?delete";s:12:"content_type";s:15:"application/xml";s:9:"http_code";i:200;s:11:"header_size";i:244;s:12:"request_size";i:576;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.32799999999999995825561427409411408007144927978515625;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.17200000000000004174438572590588591992855072021484375;s:16:"pretransfer_time";d:0.17200000000000004174438572590588591992855072021484375;s:11:"size_upload";d:180;s:13:"size_download";d:118;s:14:"speed_download";d:359;s:12:"speed_upload";d:548;s:23:"download_content_length";d:-1;s:21:"upload_content_length";d:180;s:18:"starttransfer_time";d:0.32799999999999995825561427409411408007144927978515625;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:4:"POST";}}
+response body-><?xml version="1.0" encoding="UTF-8" standalone="yes"?><DeleteResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"/>
+------------------Logging End-------------------------
+
+Tue, 24 Mar 2015 11:17:50 GMT INFO
+------------------Logging Start-------------------------
+method->objectExists args->a:1:{i:0;a:2:{s:6:"Bucket";s:18:"phpsdktestlijunwei";s:3:"Key";s:40:"dir/test/中文目录/@特殊字符!.txt";}}
+stringToSing->
+HEAD
+
+application/xml
+Tue, 24 Mar 2015 11:17:50 GMT
+/phpsdktestlijunwei/dir/test/%E4%B8%AD%E6%96%87%E7%9B%AE%E5%BD%95/%40%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%21.txt
+request url->s:132:"http://kss.ksyun.com/phpsdktestlijunwei/dir/test/%E4%B8%AD%E6%96%87%E7%9B%AE%E5%BD%95/%40%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%21.txt";
+request headers->a:3:{s:12:"Content-Type";s:15:"application/xml";s:4:"Date";s:29:"Tue, 24 Mar 2015 11:17:50 GMT";s:13:"Authorization";s:53:"KSS 1GL02rRYQxK8s7FQh8dV:gI8P2/4o5/5FAtXg2IIe7bfXcbU=";}
+request body->
+request read stream length->
+request read stream seek position->
+response code->404
+response headers->a:8:{s:6:"server";s:7:"Tengine";s:4:"date";s:29:"Tue, 24 Mar 2015 11:17:50 GMT";s:12:"content-type";s:30:"application/xml; charset=UTF-8";s:14:"content-length";s:3:"303";s:10:"connection";s:10:"keep-alive";s:21:"x-application-context";s:11:"application";s:16:"x-kss-request-id";s:32:"cff3c423f99e40209185fdc93e552e19";s:5:"_info";a:23:{s:3:"url";s:132:"http://kss.ksyun.com/phpsdktestlijunwei/dir/test/%E4%B8%AD%E6%96%87%E7%9B%AE%E5%BD%95/%40%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%21.txt";s:12:"content_type";s:30:"application/xml; charset=UTF-8";s:9:"http_code";i:404;s:11:"header_size";i:259;s:12:"request_size";i:508;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.2800000000000000266453525910037569701671600341796875;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.14000000000000001332267629550187848508358001708984375;s:16:"pretransfer_time";d:0.14000000000000001332267629550187848508358001708984375;s:11:"size_upload";d:0;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:0;s:23:"download_content_length";d:303;s:21:"upload_content_length";d:0;s:18:"starttransfer_time";d:0.2800000000000000266453525910037569701671600341796875;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:4:"HEAD";}}
+response body->
+------------------Logging End-------------------------
+
+Tue, 24 Mar 2015 11:17:51 GMT INFO
+------------------Logging Start-------------------------
+method->objectExists args->a:1:{i:0;a:2:{s:6:"Bucket";s:18:"phpsdktestlijunwei";s:3:"Key";s:4:"copy";}}
+stringToSing->
+HEAD
+
+application/xml
+Tue, 24 Mar 2015 11:17:50 GMT
+/phpsdktestlijunwei/copy
+request url->s:44:"http://kss.ksyun.com/phpsdktestlijunwei/copy";
+request headers->a:3:{s:12:"Content-Type";s:15:"application/xml";s:4:"Date";s:29:"Tue, 24 Mar 2015 11:17:50 GMT";s:13:"Authorization";s:53:"KSS 1GL02rRYQxK8s7FQh8dV:g630hEbM9W8UxUlM/9rFHll/3Ug=";}
+request body->
+request read stream length->
+request read stream seek position->
+response code->404
+response headers->a:8:{s:6:"server";s:7:"Tengine";s:4:"date";s:29:"Tue, 24 Mar 2015 11:17:51 GMT";s:12:"content-type";s:30:"application/xml; charset=UTF-8";s:14:"content-length";s:3:"267";s:10:"connection";s:10:"keep-alive";s:21:"x-application-context";s:11:"application";s:16:"x-kss-request-id";s:32:"f00c006c5f244399a15c8f25f3041c22";s:5:"_info";a:23:{s:3:"url";s:44:"http://kss.ksyun.com/phpsdktestlijunwei/copy";s:12:"content_type";s:30:"application/xml; charset=UTF-8";s:9:"http_code";i:404;s:11:"header_size";i:259;s:12:"request_size";i:332;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.311999999999999999555910790149937383830547332763671875;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.1559999999999999997779553950749686919152736663818359375;s:16:"pretransfer_time";d:0.1559999999999999997779553950749686919152736663818359375;s:11:"size_upload";d:0;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:0;s:23:"download_content_length";d:267;s:21:"upload_content_length";d:0;s:18:"starttransfer_time";d:0.311999999999999999555910790149937383830547332763671875;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:4:"HEAD";}}
+response body->
+------------------Logging End-------------------------
+
