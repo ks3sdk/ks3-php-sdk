@@ -7,6 +7,11 @@ require_once KS3_API_PATH.DIRECTORY_SEPARATOR."exceptions".DIRECTORY_SEPARATOR."
 interface Signer{
 	public function sign( Ks3Request $request,$args=array());
 }
+class DefaultUserAgentSigner implements Signer{
+	public function sign(Ks3Request $request,$args=array()){
+		$request->addHeader(Headers::$UserAgent,Consts::$UserAgent);
+	}
+}
 class DefaultContentTypeSigner implements Signer{
 	public function sign(Ks3Request $request,$args=array()){
 		$contentType = $request->getHeader(Headers::$ContentType);

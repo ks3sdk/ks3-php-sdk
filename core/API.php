@@ -6,14 +6,14 @@ class API{
 			"method"=>"GET",
 			"needBucket"=>FALSE,
 			"needObject"=>FALSE,
-			"signer"=>"DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->ListBucketsHandler"
 		),
 		"deleteBucket"=>array(
 			"method"=>"DELETE",
 			"needBucket"=>TRUE,
 			"needObject"=>FALSE,
-			"signer"=>"DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->BooleanHandler"
 		),
 		"deleteBucketCORS"=>array(
@@ -21,14 +21,14 @@ class API{
 			"needBucket"=>TRUE,
 			"needObject"=>FALSE,
 			"subResource"=>"cors",
-			"signer"=>"DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->BooleanHandler"
 		),
 		"createBucket"=>array(
 			"method"=>"PUT",
 			"needBucket"=>TRUE,
 			"needObject"=>FALSE,
-			"signer"=>"ACLSigner->DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->ACLSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"body"=>Array("builder"=>"LocationBuilder"),
 			"handler"=>"ErrorResponseHandler->BooleanHandler"
 		),
@@ -36,7 +36,7 @@ class API{
 			"method"=>"PUT",
 			"needBucket"=>TRUE,
 			"needObject"=>FALSE,
-			"signer"=>"ACLSigner->DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->ACLSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"subResource"=>"acl",
 			"handler"=>"ErrorResponseHandler->BooleanHandler"
 		),
@@ -44,7 +44,7 @@ class API{
 			"method"=>"PUT",
 			"needBucket"=>TRUE,
 			"needObject"=>FALSE,
-			"signer"=>"DefaultContentTypeSigner->ContentMD5Signer->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->ContentMD5Signer->HeaderAuthSigner",
 			"subResource"=>"cors",
 			"body"=>Array("builder"=>"CORSBuilder"),
 			"handler"=>"ErrorResponseHandler->BooleanHandler"
@@ -53,7 +53,7 @@ class API{
 			"method"=>"PUT",
 			"needBucket"=>TRUE,
 			"needObject"=>FALSE,
-			"signer"=>"DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"subResource"=>"logging",
 			"body"=>Array("builder"=>"BucketLoggingBuilder"),
 			"handler"=>"ErrorResponseHandler->BooleanHandler"
@@ -62,7 +62,7 @@ class API{
 			"method"=>"GET",
 			"needBucket"=>TRUE,
 			"needObject"=>FALSE,
-			"signer"=>"DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"queryParams"=>array("Options->prefix","Options->delimiter","Options->marker","Options->max-keys"),
 			"handler"=>"ErrorResponseHandler->ListObjectsHandler"
 		),
@@ -71,7 +71,7 @@ class API{
 			"needBucket"=>TRUE,
 			"needObject"=>FALSE,
 			"subResource"=>"acl",
-			"signer"=>"DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->GetAclHandler"
 		),
 		"getBucketCORS"=>array(
@@ -79,7 +79,7 @@ class API{
 			"needBucket"=>TRUE,
 			"needObject"=>FALSE,
 			"subResource"=>"cors",
-			"signer"=>"DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->GetBucketCORSHandler"
 		),
 		"getBucketLocation"=>array(
@@ -87,7 +87,7 @@ class API{
 			"needBucket"=>TRUE,
 			"needObject"=>FALSE,
 			"subResource"=>"location",
-			"signer"=>"DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->GetBucketLocationHandler"
 		),
 		"getBucketLogging"=>array(
@@ -95,7 +95,7 @@ class API{
 			"needBucket"=>TRUE,
 			"needObject"=>FALSE,
 			"subResource"=>"logging",
-			"signer"=>"DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->GetBucketLoggingHandler"
 		),
 		"listMutipartUploads"=>array(
@@ -104,14 +104,14 @@ class API{
 			"needObject"=>FALSE,
 			"subResource"=>"uploads",
 			"queryParams"=>array("Options->max-uploads","Options->key-marker","Options->prefix","Options->upload-id-​marker","Options->delimiter"),
-			"signer"=>"DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->ListMutipartUploadsHandler"
 		),
 		"bucketExists"=>array(
 			"method"=>"HEAD",
 			"needBucket"=>TRUE,
 			"needObject"=>FALSE,
-			"signer"=>"DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"handler"=>"ExistsHandler"
 		),
 		"putObjectByContent"=>array(
@@ -119,7 +119,7 @@ class API{
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
 			//将ContentMD5Signer放在最后的原因是，ContentMD5需要根据Content-Length计算
-			"signer"=>"ACLSigner->SuffixContentTypeSigner->ContentLengthSigner->ObjectMetaSigner->ContentMD5Signer->UserMetaSigner->AdpSigner->CallBackSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->ACLSigner->SuffixContentTypeSigner->ContentLengthSigner->ObjectMetaSigner->ContentMD5Signer->UserMetaSigner->AdpSigner->CallBackSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->UploadHandler",
 			"body"=>array("position"=>"Content")
 		),
@@ -127,14 +127,14 @@ class API{
 			"method"=>"PUT",
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
-			"signer"=>"ACLSigner->SuffixContentTypeSigner->ObjectMetaSigner->UserMetaSigner->AdpSigner->CallBackSigner->StreamUploadSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->ACLSigner->SuffixContentTypeSigner->ObjectMetaSigner->UserMetaSigner->AdpSigner->CallBackSigner->StreamUploadSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->UploadHandler"
 		),
 		"setObjectAcl"=>array(
 			"method"=>"PUT",
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
-			"signer"=>"ACLSigner->DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->ACLSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"subResource"=>"acl",
 			"handler"=>"ErrorResponseHandler->BooleanHandler"
 		),
@@ -142,28 +142,28 @@ class API{
 			"method"=>"PUT",
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
-			"signer"=>"CopySourceSigner->DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->CopySourceSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->BooleanHandler"
 		),
 		"getObjectMeta"=>array(
 			"method"=>"HEAD",
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
-			"signer"=>"DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->ObjectMetaHandler"
 		),
 		"objectExists"=>array(
 			"method"=>"HEAD",
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
-			"signer"=>"DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"handler"=>"ExistsHandler"
 		),
 		"deleteObject"=>array(
 			"method"=>"DELETE",
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
-			"signer"=>"DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->BooleanHandler"			
 		),
 		"deleteObjects"=>array(
@@ -171,7 +171,7 @@ class API{
 			"needBucket"=>TRUE,
 			"needObject"=>FALSE,
 			"subResource"=>"delete",
-			"signer"=>"DefaultContentTypeSigner->ContentMD5Signer->ContentLengthSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->ContentMD5Signer->ContentLengthSigner->HeaderAuthSigner",
 			"body"=>array("builder"=>"DeleteObjectsBuilder"),
 			"handler"=>"ErrorResponseHandler->BooleanHandler"
 		),
@@ -179,7 +179,7 @@ class API{
 			"method"=>"GET",
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
-			"signer"=>"DefaultContentTypeSigner->RangeSigner->GetObjectSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->RangeSigner->GetObjectSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->BooleanHandler"
 		),
 		"getObjectAcl" => array(
@@ -187,7 +187,7 @@ class API{
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
 			"subResource"=>"acl",
-			"signer"=>"DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->GetAclHandler"
 		),
 		"initMultipartUpload"=>array(
@@ -195,7 +195,7 @@ class API{
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
 			"subResource"=>"uploads",
-			"signer"=>"ACLSigner->SuffixContentTypeSigner->MultipartObjectMetaSigner->UserMetaSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->ACLSigner->SuffixContentTypeSigner->MultipartObjectMetaSigner->UserMetaSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->InitMultipartUploadHandler"
 		),
 		"uploadPart"=>array(
@@ -204,7 +204,7 @@ class API{
 			"needObject"=>TRUE,
 			"queryParams"=>array("!Options->uploadId","!Options->partNumber"),
 			//这个请求没有body，所以使用了ContentLengthSigner->ContentMD5Signer而没用ObjectMetaSigner
-			"signer"=>"ACLSigner->StreamContentTypeSigner->ContentLengthSigner->ContentMD5Signer->StreamUploadSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->ACLSigner->StreamContentTypeSigner->ContentLengthSigner->ContentMD5Signer->StreamUploadSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->UploadHandler"
 		),
 		"abortMultipartUpload"=>array(
@@ -212,7 +212,7 @@ class API{
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
 			"queryParams"=>array("!Options->uploadId"),
-			"signer"=>"DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->BooleanHandler"
 		),
 		"listParts"=>array(
@@ -220,7 +220,7 @@ class API{
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
 			"queryParams"=>array("!Options->uploadId","Options->max-parts","Options->part-number​-marker"),
-			"signer"=>"DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->ListPartsHandler"
 		),
 		"completeMultipartUpload"=>array(
@@ -228,7 +228,7 @@ class API{
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
 			"queryParams"=>array("!Options->uploadId"),
-			"signer"=>"DefaultContentTypeSigner->ContentLengthSigner->AdpSigner->CallBackSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->ContentLengthSigner->AdpSigner->CallBackSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->UploadHandler",
 			"body"=>array("builder"=>"CompleteMultipartUploadBuilder")
 		),
@@ -245,7 +245,7 @@ class API{
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
 			"subResource"=>"adp",
-			"signer"=>"DefaultContentTypeSigner->AdpSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->AdpSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->UploadHandler"
 		),
 		"getAdp"=>array(
@@ -254,6 +254,7 @@ class API{
 			"needObject"=>TRUE,
 			"objectPostion"=>"TaskID",//专门为这个接口定义的属性
 			"subResource"=>"queryadp",
+			"signer"=>"DefaultUserAgentSigner",
 			"handler"=>"ErrorResponseHandler->AdpHandler"
 		)
 	);

@@ -14,5 +14,6 @@ class Headers{
 	static $NotifyURL = "kss-notifyurl";
 	static $XKssCallbackUrl = "x-kss-callbackurl";
 	static $XKssCallbackBody = "x-kss-callbackbody";
+	static $UserAgent = "User-Agent";
 }
 ?>
