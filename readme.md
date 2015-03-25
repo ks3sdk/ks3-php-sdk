@@ -1,7 +1,7 @@
 # KS3 SDK For PHP使用指南 
 ---
 ## 注意
-文档中的示例代码仅供参考之用，具体使用的时候请参考KS3 API文档，根据自己的实际情况调节参数。  
+文档中的示例代码仅供参考之用，具体使用的时候请参考KS3 API文档，根据自己的实际情况调节参数。   
 直接使用示例代码中的参数可能会导致最后得到的结果和用户期望的不一致。  
 如果您在使用中有任何疑问，请联系lijunwei@kingsoft.com或添加QQ:1448039011
 
@@ -12,9 +12,9 @@
 
 ## 2 环境准备
 配置PHP 5 以上开发环境  
-添加curl拓展
-下载KS3 SDK For PHP  、
-在项目中引用该php文件，Ks3Client.class.php
+添加curl拓展  
+下载KS3 SDK For PHP  
+在项目中引用该php文件，Ks3Client.class.php  
 
 ## 3 初始化
 ### 3.1 下载SDK
@@ -23,13 +23,13 @@
 1、开通KS3服务，[http://www.ksyun.com/user/register](http://www.ksyun.com/user/register) 注册账号  
 2、进入控制台, [http://ks3.ksyun.com/console.html#/setting](http://ks3.ksyun.com/console.html#/setting) 获取AccessKeyID 、AccessKeySecret
 ### 3.3 日志配置
-在Ks3Client.php中
-//是否开启日志(写入日志文件)
-define("LOG",TRUE);
-//是否显示日志(直接输出日志)
-define("DISPLAY_LOG", TRUE);
-//定义日志目录(默认是该项目log下)
-define("LOG_PATH","");
+在Ks3Client.php中  
+//是否开启日志(写入日志文件)  
+define("LOG",TRUE);  
+//是否显示日志(直接输出日志)  
+define("DISPLAY_LOG", TRUE);  
+//定义日志目录(默认是该项目log下)  
+define("LOG_PATH","");  
 
 ### 3.4 初始化客户端
 当以上全部完成之后用户便可初始化客户端进行操作了  
@@ -45,8 +45,8 @@ define("LOG_PATH","");
 ## 5 使用示例
 ### 5.1 Service接口
 #### 5.1.1 GET Service
-获取用户的所有bucket列表 
-使用示例：
+获取用户的所有bucket列表  
+使用示例：  
 
     $client->listBuckets();
     
@@ -75,9 +75,9 @@ define("LOG_PATH","");
 
 ### 5.2 Bucket接口
 #### 5.2.1 DELETE Bucket
-删除Bucket 
-注意：
-1、只能删除空的Bucket
+删除Bucket  
+注意：  
+1、只能删除空的Bucket  
 参数格式：
 
     $args = array("Bucket"=>"<您的bucket名称>")
@@ -87,7 +87,7 @@ define("LOG_PATH","");
     $client->deleteBucket($args);
 
 #### 5.2.2 DELETE Bucket cors
-删除Bucket的跨域配置
+删除Bucket的跨域配置  
 参数格式:
 
     $args = array("Bucket"=>"<您的bucket名称>")
@@ -97,8 +97,8 @@ define("LOG_PATH","");
     $client->deleteBucketCORS($args);
 
 #### 5.2.3 GET Bucket
-罗列Bucket下的object
-参数格式：
+罗列Bucket下的object  
+参数格式：  
 Options中为可选参数，用户需参考KS3 API文档根据实际情况调节参数。
 
     $args = array(
@@ -182,7 +182,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
 
 
 #### 5.2.4 GET Bucket acl
-获取bucket的权限
+获取bucket的权限  
 参数格式:
 
     $args = array("Bucket"=>"<您的bucket名称>")
@@ -254,7 +254,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     )
 
 #### 5.2.6 GET Bucket location
-获取bucket的地址 
+获取bucket的地址   
 参数格式:  
 
     $args = array("Bucket"=>"<您的bucket名称>")
@@ -287,7 +287,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     )
 
 #### 5.2.8 HEAD Bucket
-判断一个bucket是否存在 
+判断一个bucket是否存在  
 参数格式:  
 
     $args = array("Bucket"=>"<您的bucket名称>")
@@ -301,7 +301,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     TRUE或者FALSE
 
 #### 5.2.9 List Mutipart Uploads
-列出当前bucket下未完成的分块上传
+列出当前bucket下未完成的分块上传  
 参数格式:
 
 	$args=array(
@@ -349,10 +349,10 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
 	)
 
 #### 5.2.10 PUT Bucket
-创建一个bucket 
-注意: 
-1、bucket名称是全局唯一，如果返回BucketAlreadyExists请尝试换一个名称 
-2、bucket名称规则请参考KS3 API文档 
+创建一个bucket  
+注意:  
+1、bucket名称是全局唯一，如果返回BucketAlreadyExists请尝试换一个名称   
+2、bucket名称规则请参考KS3 API文档  
 参数格式: 
 
     $args = array(
@@ -365,7 +365,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     $client->createBucket($args);
 
 #### 5.2.11 PUT Bucket acl
-设置bucket的访问权限 
+设置bucket的访问权限  
 参数格式: 
 
     $args = array(
@@ -377,9 +377,9 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     $client->setBucketAcl ($args);
 
 #### 5.2.12 PUT Bucket cors
-设置bucket的跨域规则 
-注意: 
-1、如果返回InvalidArguments，请查看KS3 API文档，查看各参数格式要求。
+设置bucket的跨域规则  
+注意:  
+1、如果返回InvalidArguments，请查看KS3 API文档，查看各参数格式要求。  
 参数格式: 
 
     $args = array(
@@ -407,7 +407,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     $client->setBucketCORS($args);
 
 #### 5.2.13 PUT Bucket logging
-设置bucket的日志配置 
+设置bucket的日志配置  
 参数格式:
 
     $args = array(
@@ -426,7 +426,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     
 ### 5.3 Object接口
 #### 5.3.1 DELETE Object
-删除一个object 
+删除一个object  
 参数格式:
 
     $args = array(
@@ -439,7 +439,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     $client->deleteObject($args);
 
 #### 5.3.2 DELETE Multiple Objects
-删除多个object
+删除多个object  
 参数格式：
 
     $args = array(
@@ -488,7 +488,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     http://kss.ksyun.com/aaphp/multi.zip?Expires=1427900010&response-content-type=application%2Fxml&KSSAccessKeyId=2HITWMQXL2VBB3XMAEHQ&Signature=E3YAKqMp0%2BVoBaslu%2B3eE3Ki97w%3D
 
 #### 5.3.4 GET Object acl
-获取object的权限
+获取object的权限  
 参数格式:
 
     $args = array("Bucket"=>"<您的bucket名称>","Key"=>"<key>")
@@ -502,7 +502,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     private、public-read或者public-read-write
 
 #### 5.3.5 HEAD Object
-可用来判断object是否存在或者获取object的元数据 
+可用来判断object是否存在或者获取object的元数据  
 参数格式:
 
     $args = array(
@@ -542,7 +542,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     )
 
 #### 5.3.6 POST Object
-表单上传文件，用于获取KSSAccessKeyId、Policy和Signature
+表单上传文件，用于获取KSSAccessKeyId、Policy和Signature  
 使用示例:
 
     $result = postObject(
@@ -624,7 +624,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     )
    
 ##### 5.3.7.3 上传文件时添加异步数据处理任务
-参数格式:
+参数格式:  
 在原有参数的基础上加上如下
 
     "Adp"=>array(
@@ -680,7 +680,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     )
 
 ##### 5.3.7.4 上传文件时添加回调
-参数格式:
+参数格式:  
 在原有参数的基础上加上如下
 
     "CallBack"=>array(
@@ -691,7 +691,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
 
 
 #### 5.3.8 PUT Object acl
-设置object的访问权限 
+设置object的访问权限  
 参数格式: 
 
     $args = array(
@@ -704,7 +704,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     $client->setObjectAcl ($args);
 
 #### 5.3.9 PUT Object - Copy
-拷贝object
+拷贝object  
 参数格式: 
 
     $args = array(
@@ -721,7 +721,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     $client->copyObject ($args);
 
 #### 5.3.10 PUT Adp
-添加异步数据处理：
+添加异步数据处理：  
 参数格式:
 
     $args=array(
@@ -754,7 +754,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
 
 
 #### 5.3.11 GET Adp
-查询数据处理任务
+查询数据处理任务  
 参数格式:
     
     $args = array("TaskID"=>"<TaskID>");
@@ -764,7 +764,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     $client->getAdp($args);
 
 #### 5.3.12 Initiate Multipart Upload
-初始化分块上传
+初始化分块上传  
 参数格式:
 
     $args = array(
@@ -791,8 +791,8 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     )
 
 #### 5.3.13 Upload Part
-上传块
-参数格式:
+上传块  
+参数格式:  
 主要通过seek_position和Content-Length参数控制上传的内容范围
 
     $args=array(
@@ -821,7 +821,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
         [ETag] => "9430d3a88773837eed6ce0f136770ea3"
     )
 #### 5.3.14 List Parts
-列出一个分块上传已经上传的块
+列出一个分块上传已经上传的块  
 参数格式:
 
     $args = array(
@@ -896,7 +896,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
 
 #### 5.3.15 Complete Multipart Upload
 ##### 5.3.15.1 基本方式
-完成分块上传
+完成分块上传  
 参数格式:
 
     $args=array(
@@ -928,7 +928,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     $client->completeMultipartUpload($args);
 
 ##### 5.3.15.2 添加异步数据处理任务
-参数格式:
+参数格式:  
 在原有参数的基础上加上如下
 
     "Adp"=>array(
@@ -951,7 +951,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     )
 
 ##### 5.3.15.3 添加回调
-参数格式:
+参数格式:  
 在原有参数的基础上加上如下
 
     "CallBack"=>array(
@@ -964,7 +964,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
 
 
 #### 5.3.16 Abort Multipart Upload
-取消分块上传
+取消分块上传  
 参数格式:
 
     $args=array(
