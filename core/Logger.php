@@ -20,8 +20,6 @@ class Logger{
 			$log_path = LOG_PATH;
 			if(empty($log_path)){
 				$log_path = KS3_API_PATH.DIRECTORY_SEPARATOR.'log'.DIRECTORY_SEPARATOR;
-			}elseif(!file_exists($log_path)){
-				throw new Ks3ClientException("log dir not exists");
 			}
 		}else{
 			$log_path = KS3_API_PATH.DIRECTORY_SEPARATOR.'log'.DIRECTORY_SEPARATOR;
@@ -29,8 +27,7 @@ class Logger{
 		
 		//检测日志目录是否存在
 		if(!file_exists($log_path)){
-			echo $log_path;
-			throw new Ks3ClientException("log dir not exists");
+			mkdir($log_path);
 		}
 
 		$log_name = $log_path.'ks3_php_sdk_'.date('Y-m-d').'.log';

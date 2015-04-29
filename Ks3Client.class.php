@@ -218,6 +218,13 @@ class Ks3Client{
 			}
 			$httpRequest->request_body=$request->body;
 
+			if(isset($args["writeCallBack"])){
+				$httpRequest->register_streaming_write_callback($args["writeCallBack"]);
+			}
+			if(isset($args["readCallBack"])){
+				$httpRequest->register_streaming_read_callback($args["readCallBack"]);
+			}
+
 			$read_stream = $request->read_stream;
 			$read_length = $request->getHeader(Headers::$ContentLength);
 			$seek_position = $request->seek_position;
@@ -230,6 +237,7 @@ class Ks3Client{
 			if(isset($write_stream)){
 				$httpRequest->set_write_stream($write_stream);
 			}
+
 			$msg.="request url->".serialize($httpRequest->request_url)."\r\n";
 			$msg.="request headers->".serialize($httpRequest->request_headers)."\r\n";
 			$msg.="request body->".$httpRequest->request_body."\r\n";

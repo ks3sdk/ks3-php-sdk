@@ -1,4 +1,6 @@
 <?php
+
+require_once KS3_API_PATH.DIRECTORY_SEPARATOR."encryption".DIRECTORY_SEPARATOR."EncryptionCallBack.php";
 /**
  * Handles all HTTP requests using cURL and manages the responses.
  *
@@ -155,7 +157,6 @@ class RequestCore
 	 * The user-defined callback function to call when a stream is written to.
 	 */
 	public $registered_streaming_write_callback = null;
-
 
 	/*%******************************************************************************************%*/
 	// CONSTANTS
@@ -529,6 +530,11 @@ class RequestCore
 	 */
 	public function streaming_read_callback($curl_handle, $file_handle, $length)
 	{
+		// Execute callback function
+		if ($this->registered_streaming_read_callback)
+		{
+			return $this->registered_streaming_read_callback->streaming_read_callback($curl_handle, $file_handle, $length,$this->read_stream,$this->seek_position);
+		}
 		// Once we've sent as much as we're supposed to send...
 		if ($this->read_stream_read >= $this->read_stream_size)
 		{
@@ -550,12 +556,6 @@ class RequestCore
 
 		$out = $read === false ? '' : $read;
 
-		// Execute callback function
-		if ($this->registered_streaming_read_callback)
-		{
-			call_user_func($this->registered_streaming_read_callback, $curl_handle, $file_handle, $out);
-		}
-
 		return $out;
 	}
 
@@ -568,6 +568,9 @@ class RequestCore
 	 */
 	public function streaming_write_callback($curl_handle, $data)
 	{
+		if ($this->registered_streaming_write_callback){
+			return $this->registered_streaming_write_callback->streaming_write_callback($curl_handle,$data,$this->write_stream);
+		}
 		$length = strlen($data);
 		$written_total = 0;
 		$written_last = 0;
@@ -582,12 +585,6 @@ class RequestCore
 			}
 
 			$written_total += $written_last;
-		}
-
-		// Execute callback function
-		if ($this->registered_streaming_write_callback)
-		{
-			call_user_func($this->registered_streaming_write_callback, $curl_handle, $written_total);
 		}
 
 		return $written_total;

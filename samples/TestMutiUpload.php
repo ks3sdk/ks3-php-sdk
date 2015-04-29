@@ -47,7 +47,7 @@ function testObject($client){
 				"uploadId"=>$uploadid
 				),
 			"ObjectMeta"=>array(
-				"Content-Length"=>$partsize
+				"Content-Length"=>min($partsize,$total-$partsize*$i)
 				),
 			"Content"=>array(
 				"content"=>$file,

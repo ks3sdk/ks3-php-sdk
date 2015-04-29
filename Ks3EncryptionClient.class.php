@@ -42,6 +42,9 @@ class Ks3EncryptionClient extends Ks3Client{
 		}else{
 			throw new Ks3ClientException("unsupported encryption mode :".ENCRYPTPTION_MODE);
 		}
+		if(ENCRYPTPTION_STORAGE_MODE != "META"){
+			throw new Ks3ClientException("unsupported encryption storage mode :".ENCRYPTPTION_STORAGE_MODE);
+		}
 	}
 
 	public function putObjectByContent($args=array()){

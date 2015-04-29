@@ -1,4 +1,5 @@
 <?php
+
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."core".DIRECTORY_SEPARATOR."Headers.php";
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."core".DIRECTORY_SEPARATOR."Utils.class.php";
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."config".DIRECTORY_SEPARATOR."Consts.php";
@@ -167,7 +168,7 @@ class ObjectMetaSigner implements Signer{
 			$ObjectMeta = $args["ObjectMeta"];
 			if(is_array($ObjectMeta)){
 				foreach ($ObjectMeta as $key => $value) {
-					if(in_array($key,Consts::$ObjectMeta)){
+					if(in_array($key,Consts::$ObjectMeta)&&!empty($value)){
 						$request->addHeader($key,$value);
 					}
 				}
@@ -182,7 +183,7 @@ class MultipartObjectMetaSigner implements Signer{
 			$ObjectMeta = $args["ObjectMeta"];
 			if(is_array($ObjectMeta)){
 				foreach ($ObjectMeta as $key => $value) {
-					if(in_array($key,Consts::$MultipartObjectMeta)){
+					if(in_array($key,Consts::$MultipartObjectMeta)&&!empty($value)){
 						$request->addHeader($key,$value);
 					}
 				}
@@ -231,6 +232,7 @@ class StreamUploadSigner implements Signer{
 			$resourceLength = 0;
 			$length = -1;
 			$isFile = FALSE;
+
 			if (!is_resource($content)){
 				$isFile = TRUE;
 				//如果之前用户已经转化为GBK则不转换
@@ -247,9 +249,6 @@ class StreamUploadSigner implements Signer{
 					$length = $stats["size"];	
 				}
 			}
-			if($length<0){
-				throw new Ks3ClientException("unexpected. can not get file size ,try use file path instead resource");
-			}
 			//之所以取resourceLength是为了防止Content-Length大于实际数据的大小，导致一直等待。
 			$resourceLength = $length;
 			//优先取用户设置seek_position，没有的话取ftell
@@ -261,28 +260,24 @@ class StreamUploadSigner implements Signer{
 					$seek_position = 0;
 				fseek($content,0);
 			}
-			$request->seek_position = $seek_position;
-			//根据seek_position计算实际长度
-			$length = $length - $seek_position;
-			if($length < 0){
-				$seek_position += $length;
-				$length = 0;
+
+			$lengthInMeta = -1;
+			if(isset($args["ObjectMeta"]["Content-Length"])){
+				$lengthInMeta = $args["ObjectMeta"]["Content-Length"];
 			}
-			$lengthInMeta = $request->getHeader(Headers::$ContentLength);
-			if(!empty($lengthInMeta)&&$lengthInMeta>=0){
+			if($lengthInMeta > 0){
 				$length = $lengthInMeta;
-			}
-			//防止设置的length大于resource的length
-			if($length + $seek_position > $resourceLength){
+			}else if($resourceLength > 0){
+				//根据seek_position计算实际长度
 				$length = $resourceLength - $seek_position;
-				if($length < 0){
-					$seek_position+=$length;
-					$length = 0;
-				}
 			}
+			if($length <= 0)
+				throw new Ks3ClientException("calculate content length failed,unexpected contetn length ".$length);
 			$request->read_stream = $content;
 			$request->addHeader(Headers::$ContentLength,$length);
 			$request->seek_position = $seek_position;
+		}else{
+			throw new Ks3ClientException("please specifie upload content in args");
 		}
 	}
 }

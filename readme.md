@@ -795,12 +795,13 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     $args=array(
         "Bucket"=>"<您的bucket名称>",
         "Key"=>"<key>",
+        "LastPart"=>FALSE,//指定当前块是否为最后一块
         "Options"=>array(
             "partNumber"=><partNumber>,//当前上传块的序号，需要为连续的正整数，
             "uploadId"=><uploadId>//由Initiate Multipart Upload获得
             ),
         "ObjectMeta"=>array(
-            "Content-Length"=><partsize>//这一块要上传的大小
+            "Content-Length"=><partsize>//这一块要上传的大小,必须准确指定，否则会出错。
             "Content-MD5"=>"<Content-MD5>"//可以提供该块的MD5值，将在服务端进行MD5校验
             ),
         "Content"=>array(
@@ -1013,7 +1014,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
                     "uploadId"=>$uploadid
                 ),
                 "ObjectMeta"=>array(
-                    "Content-Length"=>$partsize//每次上传$partsize大小
+                    "Content-Length"=>min($partsize,$total-$partsize*$i)//每次上传$partsize大小
                 ),
                 "Content"=>array(
                     "content"=>$file,
