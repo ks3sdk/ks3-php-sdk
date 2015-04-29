@@ -1,5 +1,6 @@
 <?php
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."encryption".DIRECTORY_SEPARATOR."EncryptionUtil.php";
+//下载
 class AESCBCStreamWriteCallBack{
 	private $iv;
 	private $cek;
@@ -28,7 +29,6 @@ class AESCBCStreamWriteCallBack{
 		if($length<$blocksize)
 			$this->buffer = $data;
 		else{
-
 			for($i=0;$i < (int)($length/$blocksize);$i++){
 				$dataBlock = substr($data,$i*$blocksize,$blocksize);
 				$td = mcrypt_module_open(MCRYPT_RIJNDAEL_128,'',MCRYPT_MODE_CBC,'');
@@ -68,6 +68,7 @@ class AESCBCStreamWriteCallBack{
 		return $written_total;
 	}
 }
+//上传
 class AESCBCStreamReadCallBack{
 	private $iv;
 	private $cek;
@@ -92,7 +93,6 @@ class AESCBCStreamReadCallBack{
 		// Once we've sent as much as we're supposed to send...
 		if ($this->hasread >= $this->contentLength)
 		{
-
 			// Send EOF
 			return '';
 		}
@@ -126,9 +126,7 @@ class AESCBCStreamReadCallBack{
 			if($this->mutipartUpload){
 				if($this->isLastPart){
 					$this->buffer = NULL;
-					echo "testpad".strlen($data);
 					$data = EncryptionUtil::PKCS5Padding($data,$blocksize);
-					echo strlen($data);
 				}else{
 					//donothing
 				}

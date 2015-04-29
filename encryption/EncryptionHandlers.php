@@ -20,11 +20,7 @@ class EncryptionEO implements EncryptionHandler{
 	}
 	public function putObjectByContentSecurely($args=array()){
 		$sek = EncryptionUtil::genereateOnceUsedKey();
-		$encrypKeyAlg = "AES";//TODO 对称秘钥为AES 非对称秘钥为RSA
-		$secretKey = $this->encryptionMaterials;
-		if($encrypKeyAlg === "AES"){
-			$encryptedSek = EncryptionUtil::encode_AES_ECB($sek,$secretKey);
-		}
+		$encryptedSek = EncryptionUtil::encodeCek($this->encryptionMaterials,$sek);
 		$content = $args["Content"];
 		if(empty($content))
 			throw new Ks3ClientException("please specifie Content in request args");
@@ -61,11 +57,7 @@ class EncryptionEO implements EncryptionHandler{
 	}
 	public function putObjectByFileSecurely($args=array()){
 		$sek = EncryptionUtil::genereateOnceUsedKey();
-		$encrypKeyAlg = "AES";//TODO 对称秘钥为AES 非对称秘钥为RSA
-		$secretKey = $this->encryptionMaterials;
-		if($encrypKeyAlg === "AES"){
-			$encryptedSek = EncryptionUtil::encode_AES_ECB($sek,$secretKey);
-		}
+		$encryptedSek = EncryptionUtil::encodeCek($this->encryptionMaterials,$sek);
 		if(!isset($args["Content"])||!is_array($args["Content"])
 			||!isset($args["Content"]["content"])
 			||empty($args["Content"]["content"]))
@@ -105,9 +97,9 @@ class EncryptionEO implements EncryptionHandler{
 		{
 			$iv = base64_decode($meta["UserMeta"]["x-kss-meta-x-kss-iv"]);
 			$cekEncrypted = base64_decode($meta["UserMeta"]["x-kss-meta-x-kss-key"]);
-			$secretKey = $this->encryptionMaterials;
 
-			$cek = EncryptionUtil::decode_AES_ECB($cekEncrypted,$secretKey);
+			$cek = EncryptionUtil::decodeCek($this->encryptionMaterials,$cekEncrypted);
+
 			$writeCallBack = new AESCBCStreamWriteCallBack();
 			$writeCallBack->iv=$iv;
 			$writeCallBack->cek=$cek;
@@ -118,11 +110,7 @@ class EncryptionEO implements EncryptionHandler{
 	}
 	public function initMultipartUploadSecurely($args=array()){
 		$sek = EncryptionUtil::genereateOnceUsedKey();
-		$encrypKeyAlg = "AES";//TODO 对称秘钥为AES 非对称秘钥为RSA
-		$secretKey = $this->encryptionMaterials;
-		if($encrypKeyAlg === "AES"){
-			$encryptedSek = EncryptionUtil::encode_AES_ECB($sek,$secretKey);
-		}
+		$encryptedSek = EncryptionUtil::encodeCek($this->encryptionMaterials,$sek);
 		$td = mcrypt_module_open(MCRYPT_RIJNDAEL_128,'',MCRYPT_MODE_CBC,'');
 		$iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($td),MCRYPT_RAND);
 		

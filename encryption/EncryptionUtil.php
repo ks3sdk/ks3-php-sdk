@@ -35,6 +35,43 @@ class EncryptionUtil{
 
 		return trim($data);
 	}
+	public static function getKeyEncryptionAlgm($encryptionMaterials){
+		if(is_array($encryptionMaterials)){
+			return "RSA";
+		}else{
+			return "AES";
+		}
+	}
+	public static function encodeCek($encryptionMaterials,$cek){
+		$encrypKeyAlg = EncryptionUtil::getKeyEncryptionAlgm($encryptionMaterials);
+		if($encrypKeyAlg === "AES"){
+			$secretKey = $encryptionMaterials;
+			$encryptedSek = EncryptionUtil::encode_AES_ECB($cek,$secretKey);
+			if(empty($encryptedSek))
+				throw new Ks3ClientException("can not encode cek useing AES");
+		}else if($encrypKeyAlg === "RSA"){
+			$encryptedSek = "";
+			openssl_public_encrypt($cek,$encryptedSek, $encryptionMaterials[0]);
+			if(empty($encryptedSek))
+				throw new Ks3ClientException("can not encode cek useing RSA");
+		}
+		return $encryptedSek;
+	}
+	public static function decodeCek($encryptionMaterials,$cekEncrypted){
+		$encrypKeyAlg = EncryptionUtil::getKeyEncryptionAlgm($encryptionMaterials);
+		if($encrypKeyAlg === "AES"){
+			$secretKey = $encryptionMaterials;
+			$cek = EncryptionUtil::decode_AES_ECB($cekEncrypted,$secretKey);
+			if(empty($cek))
+				throw new Ks3ClientException("can not decode cek useing AES,secret key maybe not correct");
+		}else if($encrypKeyAlg === "RSA"){
+			$cek = "";
+			openssl_private_decrypt($cekEncrypted,$cek, $encryptionMaterials[1]);
+			if(empty($cek))
+				throw new Ks3ClientException("can not decode cek useing RSA,public/private key pair maybe not correct");
+		}
+		return $cek;
+	}
 	public static function getPKCS5EncrypedLength($length,$blocksize){
 		$pad = $blocksize - $length%$blocksize;
 		return $length+$pad;
