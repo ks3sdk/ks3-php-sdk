@@ -100,10 +100,42 @@ class EncryptionEO implements EncryptionHandler{
 
 			$cek = EncryptionUtil::decodeCek($this->encryptionMaterials,$cekEncrypted);
 
+			if(isset($args["Range"])){
+				$range = $args["Range"];
+				if(!is_array($range)){
+					if(preg_match('/^bytes=[0-9]*-[0-9]*$/', $range)){
+						$ranges = explode("-",substr($range,strlen("bytes=")));
+						$a = $ranges[0];
+						$b = $ranges[1];
+						if($a > $b){
+							throw new Ks3ClientException("Invalid range ".$range);
+						}
+						$range = array("start"=>$a,"end"=>$b);
+					}else{
+						throw new Ks3ClientException("Invalid range ".$range);
+					}
+				}else{
+					if(!isset($range["start"])||!isset($range["end"])){
+						throw new Ks3ClientException("Invalid range ".serialize($range));
+					}
+					if($range["start"] > $range["end"]){
+						throw new Ks3ClientException("Invalid range ".serialize($range));
+					}
+				}
+			}
+
 			$writeCallBack = new AESCBCStreamWriteCallBack();
 			$writeCallBack->iv=$iv;
 			$writeCallBack->cek=$cek;
 			$writeCallBack->contentLength = $meta["ObjectMeta"]["Content-Length"];
+			if(isset($range)){
+				$blocksize = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128,MCRYPT_MODE_CBC);
+				$adjustedRange = EncryptionUtil::getAdjustedRange($range,$blocksize);
+				$writeCallBack->expectedRange = $range;
+				$writeCallBack->adjustedRange = $adjustedRange;
+
+				$args["Range"]=$adjustedRange;
+			}
 			$args["writeCallBack"] = $writeCallBack;
 		}
 		return $this->ks3client->getObject($args);

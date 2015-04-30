@@ -42,6 +42,17 @@ class EncryptionUtil{
 			return "AES";
 		}
 	}
+	public static function getAdjustedRange($range,$blocksize){
+		$a = $range["start"];
+		$b = $range["end"];
+		$a = $a - ($a%$blocksize)-$blocksize;
+		if($a < 0)
+			$a = 0;
+
+		$b = $b+$blocksize-$b%$blocksize+$blocksize;
+
+		return array("start"=>$a,"end"=>$b);
+	}
 	public static function encodeCek($encryptionMaterials,$cek){
 		$encrypKeyAlg = EncryptionUtil::getKeyEncryptionAlgm($encryptionMaterials);
 		if($encrypKeyAlg === "AES"){
