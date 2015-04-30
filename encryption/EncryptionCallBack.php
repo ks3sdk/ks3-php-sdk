@@ -71,7 +71,7 @@ class AESCBCStreamWriteCallBack{
 			if($this->currentIndex+strlen($decoded) >=$this->contentLength){
 				$needRemovePad = TRUE;
 				$pad = ord(substr($decoded,strlen($decoded)-1,1));
-				if($pad<0||$pad>$blocksize)
+				if($pad<=0||$pad>$blocksize)
 				{
 					//invalid pad
 					$needRemovePad = FALSE;
