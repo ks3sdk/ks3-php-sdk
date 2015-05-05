@@ -1044,9 +1044,13 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
 添加mcrypt与openssl拓展
 #### 5.4.2 初始化客户端
 1、使用256位AES对称主密钥  
-$client = new Ks3EncryptionClient("<AccessKeyId>","<AccessKeySecret>","<Secret>");  
+
+    $client = new Ks3EncryptionClient("<AccessKeyId>","<AccessKeySecret>","<Secret>");  
+
 2、使用1024位RSA非对称主秘钥(密钥对)  
-$client = new Ks3EncryptionClient("<AccessKeyId>","<AccessKeySecret>",array("<PublicKey>","<PrivateKey>"));
+
+    $client = new Ks3EncryptionClient("<AccessKeyId>","<AccessKeySecret>",array("<PublicKey>","<PrivateKey>"));
+    
 #### 5.4.3 注意事项
 1、上传上去的文件是经过加密的。  
 2、下载文件只能通过该客户端getObject方法下载，用其他方法下载下来的文件是经过加密的。    
