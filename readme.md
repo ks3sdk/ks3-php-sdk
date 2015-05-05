@@ -1037,3 +1037,18 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
         $result = $client->completeMultipartUpload($args);
         print_r($result);
     }
+
+### 5.4 客户端加密
+
+#### 5.4.1 环境准备
+添加mcrypt与openssl拓展
+#### 5.4.2 初始化客户端
+1、使用256位AES对称主密钥  
+$client = new Ks3EncryptionClient("<AccessKeyId>","<AccessKeySecret>","<Secret>");  
+2、使用1024位RSA非对称主秘钥(密钥对)  
+$client = new Ks3EncryptionClient("<AccessKeyId>","<AccessKeySecret>",array("<PublicKey>","<PrivateKey>"));
+#### 5.4.3 注意事项
+1、上传上去的文件是经过加密的。  
+2、下载文件只能通过该客户端getObject方法下载，用其他方法下载下来的文件是经过加密的。    
+3、分块上传时必须依次上传每一块。当上传最后一块时必须通过$args=array("LastPart"=>TRUE)指定最后一块。上传顺序不能错乱，不能使用多线程分块上传。  
+4、请妥善保管自己的主密钥，如果主密钥丢失，将无法解密数据。    

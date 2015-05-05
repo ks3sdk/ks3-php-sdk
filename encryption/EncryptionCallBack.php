@@ -100,9 +100,15 @@ class AESCBCStreamWriteCallBack{
 			}
 			if($needRemovePad){
 				$padOffset = $pad-$endOffset;
-				$decoded = substr($decoded,0,strlen($decoded)-$padOffset);
+				$actualWriteCount = strlen($decoded)-$padOffset;
+				if($actualWriteCount <= 0)//负数的情况就是用户期望的range里全是填充的
+					$decoded = "";
+				else
+					$decoded = substr($decoded,0,strlen($decoded)-$padOffset);
 			}
 			$count = fwrite($write_stream, $decoded);
+			if($count == 0)
+				$count = $actualWriteCount;
 			$count += $padOffset;
 			$count += $startOffset;
 			$count += $endOffset;

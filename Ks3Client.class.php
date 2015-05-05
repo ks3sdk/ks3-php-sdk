@@ -4,22 +4,22 @@
 date_default_timezone_set('Asia/Shanghai');
 
 //检测API路径
-if(!defined('KS3_API_PATH'))
-define('KS3_API_PATH', dirname(__FILE__));
+if(!defined("KS3_API_PATH"))
+define("KS3_API_PATH", dirname(__FILE__));
 //是否使用VHOST
-if(!defined('VHOST'))
+if(!defined("VHOST"))
 define("VHOST",FALSE);
 //是否开启日志(写入日志文件)
-if(!defined('LOG'))
+if(!defined("LOG"))
 define("LOG",TRUE);
 //是否显示日志(直接输出日志)
-if(!defined('DISPLAY_LOG'))
+if(!defined("DISPLAY_LOG"))
 define("DISPLAY_LOG", TRUE);
 //定义日志目录(默认是该项目log下)
-if(!defined('LOG_PATH'))
+if(!defined("LOG_PATH"))
 define("LOG_PATH","");
 define("Author","lijunwei@kingsoft.com");
-define("Version","1.0");
+define("Version","1.1");
 
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."config".DIRECTORY_SEPARATOR."Consts.php";
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."core".DIRECTORY_SEPARATOR."API.php";

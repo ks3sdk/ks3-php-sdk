@@ -1,5 +1,6 @@
 <?php
 class EncryptionUtil{
+	public static $INSTRUCTION_SUFFIX = ".instruction";
 	public static function genereateOnceUsedKey($length=32){
 		$randpwd = "";  
 		for ($i = 0; $i < $length; $i++)  
@@ -191,17 +192,22 @@ class EncryptionUtil{
 		}
 		return -1;
 	}
-	public static function initMultipartUploadContext($initResult,$iv,$cek){
+	public static function initMultipartUploadContext($initResult,$iv,$cek,$encryptedCek,$matdesc="{}"){
 		$cacheDir = KS3_API_PATH.DIRECTORY_SEPARATOR."cache".DIRECTORY_SEPARATOR;
 		$encryptionDir = KS3_API_PATH.DIRECTORY_SEPARATOR."cache".DIRECTORY_SEPARATOR."encryption".DIRECTORY_SEPARATOR;
 		if(!is_dir($cacheDir))
 			mkdir($cacheDir);
 		if(!is_dir($encryptionDir))
 			mkdir($encryptionDir);
+		if(is_array($matdesc)){
+			$matdesc = json_encode($matdesc);
+		}
 		$initResult["firstIv"] = base64_encode($iv);
 		$initResult["nextIv"] = base64_encode($iv);
 		$initResult["cek"] = base64_encode($cek);
+		$initResult["encryptedCek"] = base64_encode($encryptedCek);
 		$initResult["lastPart"] = FALSE;
+		$initResult["matdesc"] = $matdesc;
 		$json = json_encode($initResult);
 		$file = EncryptionUtil::openfile($encryptionDir.$initResult["UploadId"], "w");
 		fwrite($file, $json);
@@ -219,6 +225,8 @@ class EncryptionUtil{
 	}
 	public static function getMultipartUploadContext($UploadId){
 		$encryptionDir = KS3_API_PATH.DIRECTORY_SEPARATOR."cache".DIRECTORY_SEPARATOR."encryption".DIRECTORY_SEPARATOR;
+		if(!EncryptionUtil::multipartUploadContextExists($UploadId))
+			throw new Ks3ClientException("can not found multipart upload context in cache dir");
 		$jsonString = file_get_contents($encryptionDir.$UploadId);
 		$arry = json_decode($jsonString,TRUE);
 		return $arry;
@@ -237,6 +245,35 @@ class EncryptionUtil{
 			return $file;
 		else
 			throw new Ks3ClientException("open file ".$path." error");
+	}
+	//matdesc为字符串或array数据类型。
+	public static function createInstructionFile($bucket,$key,$cek,$iv,$matdesc="{}"){
+		if(is_array($matdesc)){
+			$matdesc = json_encode($matdesc);
+		}
+		$key = $key.EncryptionUtil::$INSTRUCTION_SUFFIX;
+
+		$instruction = json_encode(array(
+			"x-kss-key"=>$cek,
+			"x-kss-iv"=>$iv,
+			"x-kss-matdesc"=>$matdesc
+			));
+
+		$req = array(
+			"Bucket"=>$bucket,
+			"Key"=>$key,
+			"Content"=>$instruction,
+			"UserMeta"=>array(
+				"x-kss-meta-x-kss-crypto-instr-file"=>$key
+				)
+			);
+		return $req;
+	}
+	public static function isInstructionFile($bucket,$key,$client){
+		$meta = $client->getObjectMeta(array("Bucket"=>$bucket,"Key"=>$key));
+		if(isset($meta["UserMeta"]["x-kss-meta-x-kss-crypto-instr-file"]))
+			return TRUE;
+		return FALSE;
 	}
 }
 ?>

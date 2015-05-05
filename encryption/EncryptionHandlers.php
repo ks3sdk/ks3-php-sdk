@@ -50,10 +50,23 @@ class EncryptionEO implements EncryptionHandler{
 
 		$args = EncryptionUtil::updateContentMD5Header($args);
 
-		$args["UserMeta"]["x-kss-meta-x-kss-key"] = base64_encode($encryptedSek);
-		$args["UserMeta"]["x-kss-meta-x-kss-iv"] = base64_encode($iv);
+		//TODO
+		$matdesc = "{}";
+		if(ENCRYPTPTION_STORAGE_MODE == "ObjectMetadata"){
+			$args["UserMeta"]["x-kss-meta-x-kss-key"] = base64_encode($encryptedSek);
+			$args["UserMeta"]["x-kss-meta-x-kss-iv"] = base64_encode($iv);
+			$args["UserMeta"]["x-kss-meta-x-kss-matdesc"] = $matdesc;
+		}
 
-		return $this->ks3client->putObjectByContent($args);
+		$result = $this->ks3client->putObjectByContent($args);
+
+		if(ENCRYPTPTION_STORAGE_MODE == "InstructionFile"){
+			$req = EncryptionUtil::createInstructionFile($args["Bucket"],$args["Key"],
+			base64_encode($encryptedSek),base64_encode($iv),$matdesc);
+			$this->ks3client->putObjectByContent($req);
+		}
+
+		return $result;
 	}
 	public function putObjectByFileSecurely($args=array()){
 		$sek = EncryptionUtil::genereateOnceUsedKey();
@@ -75,8 +88,6 @@ class EncryptionEO implements EncryptionHandler{
 
 		$args["ObjectMeta"]["Content-Length"] = $encryptedLength;
 		$args["UserMeta"]["x-kss-meta-x-kss-unencrypted-content-length"] = $plainTextLength;
-		$args["UserMeta"]["x-kss-meta-x-kss-key"] = base64_encode($encryptedSek);
-		$args["UserMeta"]["x-kss-meta-x-kss-iv"] = base64_encode($iv);
 
 		$readCallBack = new AESCBCStreamReadCallBack();
 		$readCallBack->iv = $iv;
@@ -84,21 +95,82 @@ class EncryptionEO implements EncryptionHandler{
 		$readCallBack->contentLength = $plainTextLength;
 		$args["readCallBack"] = $readCallBack;
 
-		return $this->ks3client->putObjectByFile($args);
+		//TODO
+		$matdesc = "{}";
+		if(ENCRYPTPTION_STORAGE_MODE == "ObjectMetadata"){
+			$args["UserMeta"]["x-kss-meta-x-kss-key"] = base64_encode($encryptedSek);
+			$args["UserMeta"]["x-kss-meta-x-kss-iv"] = base64_encode($iv);
+			$args["UserMeta"]["x-kss-meta-x-kss-matdesc"] = $matdesc;
+		}
+
+		$result = $this->ks3client->putObjectByFile($args);
+
+		if(ENCRYPTPTION_STORAGE_MODE == "InstructionFile"){
+			$req = EncryptionUtil::createInstructionFile($args["Bucket"],$args["Key"],
+			base64_encode($encryptedSek),base64_encode($iv),$matdesc);
+			$this->ks3client->putObjectByContent($req);
+		}
+
+		return $result;
 	}
 	public function getObjectSecurely($args=array()){
 		$meta = $this->ks3client->getObjectMeta($args);
 		if(isset($meta["UserMeta"]["x-kss-meta-x-kss-key"])&&isset($meta["UserMeta"]["x-kss-meta-x-kss-iv"])){
-			$encrypted = TRUE;
+			$encryptedInMeta = TRUE;
 		}else{
-			$encrypted = FALSE;
+			$encryptedInMeta = FALSE;
 		}
+		$encrypted = TRUE;
+		$encryptionInfo = array();
+		if($encryptedInMeta){
+			$encryptionInfo["iv"] = base64_decode($meta["UserMeta"]["x-kss-meta-x-kss-iv"]);
+			$matdesc =$meta["UserMeta"]["x-kss-meta-x-kss-matdesc"];
+			$encryptionInfo["matdesc"] = $matdesc;
+			$cekEncrypted = base64_decode($meta["UserMeta"]["x-kss-meta-x-kss-key"]);
+			$encryptionInfo["cek"] = $cek = EncryptionUtil::decodeCek($this->encryptionMaterials,$cekEncrypted);
+		}else{
+			if($this->ks3client->objectExists(array(
+				"Bucket"=>$args["Bucket"],
+				"Key"=>$args["Key"].EncryptionUtil::$INSTRUCTION_SUFFIX)
+				)
+			){
+				$cacheDir = KS3_API_PATH.DIRECTORY_SEPARATOR."cache".DIRECTORY_SEPARATOR;
+				$encryptionDir = KS3_API_PATH.DIRECTORY_SEPARATOR."cache".DIRECTORY_SEPARATOR."encryption".DIRECTORY_SEPARATOR;
+				if(!is_dir($cacheDir))
+					mkdir($cacheDir);
+				if(!is_dir($encryptionDir))
+					mkdir($encryptionDir);
+				$insKey = $args["Key"].EncryptionUtil::$INSTRUCTION_SUFFIX;
+				$getIns = array(
+					"Bucket"=>$args["Bucket"],
+					"Key"=>$insKey,
+					"WriteTo"=>$encryptionDir.base64_encode($insKey));
+				if(!EncryptionUtil::isInstructionFile($args["Bucket"],$insKey,$this->ks3client))
+					throw new Ks3ClientException($insKey." is not an InstructionFile");
+				$this->ks3client->getObject($getIns);
+
+				$content = file_get_contents($encryptionDir.base64_encode($insKey));
+				@unlink($encryptionDir.base64_encode($insKey));
+				$content = json_decode($content,TRUE);
+				$encryptionInfo["iv"] = base64_decode($content["x-kss-iv"]);
+				$matdesc =$content["x-kss-matdesc"];
+				$encryptionInfo["matdesc"] = $matdesc;
+				$cekEncrypted = base64_decode($content["x-kss-key"]);
+				$encryptionInfo["cek"] = $cek = EncryptionUtil::decodeCek($this->encryptionMaterials,$cekEncrypted);
+			}else{
+				$encrypted =FALSE;
+			}
+		}
+
 		if($encrypted)
 		{
-			$iv = base64_decode($meta["UserMeta"]["x-kss-meta-x-kss-iv"]);
-			$cekEncrypted = base64_decode($meta["UserMeta"]["x-kss-meta-x-kss-key"]);
+			$iv = $encryptionInfo["iv"];
+			$cek = $encryptionInfo["cek"];
 
-			$cek = EncryptionUtil::decodeCek($this->encryptionMaterials,$cekEncrypted);
+			if(empty($iv))
+				throw new Ks3ClientException("can not find iv in UserMeta or InstructionFile");
+			if(empty($cek))
+				throw new Ks3ClientException("can not find cek in UserMeta or InstructionFile");
 
 			if(isset($args["Range"])){
 				$range = $args["Range"];
@@ -146,12 +218,16 @@ class EncryptionEO implements EncryptionHandler{
 		$td = mcrypt_module_open(MCRYPT_RIJNDAEL_128,'',MCRYPT_MODE_CBC,'');
 		$iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($td),MCRYPT_RAND);
 		
-		$args["UserMeta"]["x-kss-meta-x-kss-key"] = base64_encode($encryptedSek);
-		$args["UserMeta"]["x-kss-meta-x-kss-iv"] = base64_encode($iv);
+		$matdesc = "{}";
+		if(ENCRYPTPTION_STORAGE_MODE == "ObjectMetadata"){
+			$args["UserMeta"]["x-kss-meta-x-kss-key"] = base64_encode($encryptedSek);
+			$args["UserMeta"]["x-kss-meta-x-kss-iv"] = base64_encode($iv);
+			$args["UserMeta"]["x-kss-meta-x-kss-matdesc"] = $matdesc;
+		}
 
 		$initResult = $this->ks3client->initMultipartUpload($args);
 
-		EncryptionUtil::initMultipartUploadContext($initResult,$iv,$sek);
+		EncryptionUtil::initMultipartUploadContext($initResult,$iv,$sek,$encryptedSek,$matdesc);
 
 		return $initResult;
 	}
@@ -207,6 +283,11 @@ class EncryptionEO implements EncryptionHandler{
 			throw new Ks3ClientException("Unable to complete an encrypted multipart upload without being told which part was the last. when upload part you can add item in args like args[\"LastPart\"]=TRUE");
 		}
 		$result = $this->ks3client->completeMultipartUpload($args);
+		if(ENCRYPTPTION_STORAGE_MODE=="InstructionFile"){
+			$req = EncryptionUtil::createInstructionFile($args["Bucket"],$args["Key"],
+			$context["encryptedCek"],$context["firstIv"],$context["matdesc"]);
+			$this->ks3client->putObjectByContent($req);
+		}
 		EncryptionUtil::deleteMultipartUploadContext($uploadId);
 		return $result;
 	}

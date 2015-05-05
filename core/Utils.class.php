@@ -212,6 +212,9 @@ class Utils{
 		if(!((strtoupper(substr(PHP_OS,0,3))=="WIN"))){//如果不是windows系统，尝试使用stat命令
 			$size=trim(`stat -c%s $path`);
 		}else{//如果是windows系统，尝试cmd命令
+			if(!class_exists("COM")){
+				throw new Ks3ClientException("please add 'extension=php_com_dotnet.dll' and set 'com.allow_dcom = true' in php.ini and restart");
+			}
 			 $fs = new COM("Scripting.FileSystemObject");
    			 $size=$fs->GetFile($path)->Size;
 		}
