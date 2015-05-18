@@ -7,7 +7,7 @@ interface Handler{
 class ErrorResponseHandler implements Handler{
 	public function handle(ResponseCore $response){
 		$code = $response->status;
-		if(!$response->isOk()){
+		if($code >= 400){
 			$exception = new Ks3ServiceException();
 			$exception->statusCode=$code;
 			if(!empty($response->body)){

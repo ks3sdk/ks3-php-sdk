@@ -1,4 +1,6 @@
 <?php
+define("USE_HTTPS", TRUE);
+define("VHOST",TRUE);
 require_once "../Ks3Client.class.php";
 require_once "../core/Utils.class.php";
 
@@ -6,7 +8,7 @@ $client = new Ks3Client("2HITWMQXL2VBB3XMAEHQ","ilZQ9p/NHAK1dOYA/dTKKeIqT/t67rO6
 //print_r(listBuckets($client));
 //print_r(deleteBucket($client));
 //print_r(deleteBucketCORS($client));
-//print_r(listObjects($client));
+print_r(listObjects($client));
 //print_r(getBucketAcl($client));
 //print_r(getBucketCORS($client));
 //print_r(getBucketLocation($client));
@@ -24,7 +26,7 @@ $client = new Ks3Client("2HITWMQXL2VBB3XMAEHQ","ilZQ9p/NHAK1dOYA/dTKKeIqT/t67rO6
 //print_r(getObjectMeta($client));
 //print_r(setObjectAcl($client));
 //print_r(copyObject($client));
-print_r(putObjectByFile($client));
+//print_r(putObjectByFile($client));
 //print_r(multipartUpload($client));
 //print_r(abortMultipartUpload($client));
 //print_r(generatePresignedUrl($client));
@@ -43,7 +45,7 @@ function deleteBucketCORS($client){
 }
 function listObjects($client){
 	$args = array(
-		"Bucket"=>"ksc-scm",
+		"Bucket"=>"lijunwei.test",
 		"Options"=>array(
 			//"prefix"=>"dir/",
 			"max-keys"=>4,

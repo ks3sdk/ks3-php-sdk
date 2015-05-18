@@ -18,6 +18,9 @@ define("DISPLAY_LOG", TRUE);
 //定义日志目录(默认是该项目log下)
 if(!defined("LOG_PATH"))
 define("LOG_PATH","");
+//是否使用HTTPS
+if(!defined("USE_HTTPS"))
+define("USE_HTTPS",FALSE);
 define("Author","lijunwei@kingsoft.com");
 define("Version","1.1");
 
@@ -99,6 +102,12 @@ class Ks3Client{
 	public function __call($method,$args=array()){
 		$msg = "------------------Logging Start-------------------------\r\n";
 		$msg .= "method->".$method." args->".serialize($args)."\r\n";
+		$result = $this->invoke($method,$args,$msg);
+		$result["msg"] .= "------------------Logging End-------------------------\r\n";
+		$this->log->info($result["msg"]);
+		return $result["data"];
+	}
+	private function invoke($method,$args=array(),$msg,$location=NULL){
 		if(count($args) !== 0){
 			if(count($args)>1||!is_array($args[0]))
 				throw new Ks3ClientException("this method only needs one array argument");
@@ -107,6 +116,9 @@ class Ks3Client{
 		$api = API::$API[$method];
 		if(!$api){
 			throw new Ks3ClientException($method." Not Found API");
+		}
+		if(isset($api["redirect"])){
+			$api = API::$API[$api["redirect"]];
 		}
 		$request = new Ks3Request();
 		if($api["needBucket"]){
@@ -135,7 +147,10 @@ class Ks3Client{
 			}
 		}
 		$request->method=$api["method"];
-		$request->scheme="http://";
+		if(USE_HTTPS)
+			$request->scheme="https://";
+		else
+			$request->scheme="http://";
 		$request->endpoint=$this->endpoint;
 		//add subresource
 		if(!empty($api["subResource"])){
@@ -211,6 +226,8 @@ class Ks3Client{
 
 		if($signer===NULL||!($signer instanceof QueryAuthSigner)){
 			$url = $request->toUrl($this->endpoint);
+			if($location!=NULL)
+				$url = $location;
 			$httpRequest = new RequestCore($url);
 			$httpRequest->set_method($request->method);
 			foreach ($request->headers as $key => $value) {
@@ -247,21 +264,30 @@ class Ks3Client{
 			//print_r($httpRequest);
 			$body = $httpRequest->get_response_body ();	
 			$data =  new ResponseCore ( $httpRequest->get_response_header() , Utils::replaceNS2($body), $httpRequest->get_response_code () );
+
+			if($data->status == 307){
+				$respHeaders = $httpRequest->get_response_header();
+				$location = $respHeaders["location"];
+				if(substr($location,0,4) == "http"){
+					$msg.="response code->".$httpRequest->get_response_code ()."\r\n";
+					$msg.="response headers->".serialize($httpRequest->get_response_header())."\r\n";
+					$msg.="response body->".$body."\r\n";
+					$msg.="retry request to ".$location."\r\n";
+					//array($args)详见invoke开头
+					return $this->invoke($method,array($args),$msg,$location);
+				}
+			}
 			$msg.="response code->".$httpRequest->get_response_code ()."\r\n";
 			$msg.="response headers->".serialize($httpRequest->get_response_header())."\r\n";
 			$msg.="response body->".$body."\r\n";
-			$msg.= "------------------Logging End-------------------------\r\n";
-			$this->log->info($msg);
 			$handlers = explode("->",$api["handler"]);
 			foreach ($handlers as $key => $value) {
 				$handler = new $value();
 				$data = $handler->handle($data);
 			}
-			return $data;
+			return array("msg"=>$msg,"data"=>$data);
 		}else{
-			$msg.= "------------------Logging End-------------------------\r\n";
-			$this->log->info($msg);
-			return $request->toUrl($this->endpoint);
+			return array("msg"=>$msg,"data"=>$request->toUrl($this->endpoint));
 		}
 	}
 	//用于生产表单上传时的签名信息

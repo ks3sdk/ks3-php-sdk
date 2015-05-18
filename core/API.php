@@ -1,7 +1,17 @@
 <?php
-
+/*
+redirect:跳转至对应的API，即别名
+method：HTTP Method
+needBucket:是否需要bucket
+needObject：是否需要object
+signer：请求构造链
+handler：结果处理链
+*/
 class API{
 	public static $API = array(
+		"getService"=>array(
+			"redirect"=>"listBuckets"
+		),
 		"listBuckets"=> array(
 			"method"=>"GET",
 			"needBucket"=>FALSE,
