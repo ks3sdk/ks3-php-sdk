@@ -142,6 +142,19 @@ class ObjectMetaHandler implements Handler{
 		return $Meta;
 	}
 }
+class CopyHandler implements Handler{
+	public function handle(ResponseCore $response){
+		$headers = array();
+
+		foreach ($response->header as $key => $value) {
+			if(isset(Consts::$SSEHandler[strtolower($key)])&&!empty($value)){
+				$headers[Consts::$SSEHandler[strtolower($key)]]=$value;
+			}
+		}
+
+		return $headers;
+	}	
+}
 class InitMultipartUploadHandler implements Handler{
 	public function handle(ResponseCore $response){
 		$upload = array();
@@ -149,6 +162,13 @@ class InitMultipartUploadHandler implements Handler{
 		foreach ($xml->children() as $key => $value) {
 			$upload[$key] = $value->__toString();
 		}
+
+		foreach ($response->header as $key => $value) {
+			if(isset(Consts::$SSEHandler[strtolower($key)])&&!empty($value)){
+				$upload[Consts::$SSEHandler[strtolower($key)]]=$value;
+			}
+		}
+
 		return $upload;
 	}
 }

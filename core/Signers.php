@@ -405,6 +405,76 @@ class CallBackSigner{
 		}
 	}
 }
+class SSESigner{
+	public function sign(Ks3Request $request,$args=array()){
+		$args = $args["args"];
+		if(isset($args["SSE"])){
+			if(isset($args["SSE"]["Algm"]))
+				$algm = $args["SSE"]["Algm"];
+			if(isset($args["SSE"]["KMSId"]))
+				$id = $args["SSE"]["KMSId"];
+			if(!empty($algm)){		
+				$request->addHeader(Headers::$SSEAlgm,$algm);
+				if(!empty($id))
+					$request->addHeader(Headers::$SSEKMSId,$id);
+			}
+		}
+	}
+}
+class SSECSigner{
+	public function sign(Ks3Request $request,$args=array()){
+		$args = $args["args"];
+		if(isset($args["SSEC"])){
+			if(isset($args["SSEC"]["Algm"]))
+				$algm = $args["SSEC"]["Algm"];
+			if(isset($args["SSEC"]["Key"]))
+				$key = $args["SSEC"]["Key"];
+			if(isset($args["SSEC"]["KeyBase64"]))
+				$keybase64 = $args["SSEC"]["KeyBase64"];
+			if(isset($args["SSEC"]["KeyMD5"]))
+				$md5 = $args["SSEC"]["KeyMD5"];
+			if(!empty($key)||!empty($keybase64)){
+				if(empty($key))
+					$key = base64_decode($keybase64);
+				if(empty($algm))
+					$algm = Consts::$SSEDefaultAlgm;
+				if(empty($md5))
+					$md5 = base64_encode(md5($key));
+
+				$request->addHeader(Headers::$SSECAlgm,$algm);
+				$request->addHeader(Headers::$SSECKey,base64_encode($key));
+				$request->addHeader(Headers::$SSECMD5,$md5);
+			}
+		}
+	}	
+}
+class SSECSourceSigner{
+		public function sign(Ks3Request $request,$args=array()){
+		$args = $args["args"];
+		if(isset($args["SSECSource"])){
+			if(isset($args["SSECSource"]["Algm"]))
+				$algm = $args["SSECSource"]["Algm"];
+			if(isset($args["SSECSource"]["Key"]))
+				$key = $args["SSECSource"]["Key"];
+			if(isset($args["SSECSource"]["KeyBase64"]))
+				$keybase64 = $args["SSECSource"]["KeyBase64"];
+			if(isset($args["SSECSource"]["KeyMD5"]))
+				$md5 = $args["SSECSource"]["KeyMD5"];
+			if(!empty($key)||!empty($keybase64)){
+				if(empty($key))
+					$key = base64_decode($keybase64);
+				if(empty($algm))
+					$algm = Consts::$SSEDefaultAlgm;
+				if(empty($md5))
+					$md5 = base64_encode(md5($key));
+
+				$request->addHeader(Headers::$SSECSourceAlgm,$algm);
+				$request->addHeader(Headers::$SSECSourceKey,base64_encode($key));
+				$request->addHeader(Headers::$SSECSourceMD5,$md5);
+			}
+		}
+	}
+}
 class AuthUtils{
 	public static function canonicalizedKssHeaders(Ks3Request $request){
 		$header = "";
@@ -412,7 +482,7 @@ class AuthUtils{
 		ksort($headers,SORT_STRING);
 		foreach ( $headers as $header_key => $header_value ) {
 			if (substr(strtolower($header_key), 0, 6) === Consts::$KS3HeaderPrefix){
-				$header .= "\n".$header_key . ':' . $header_value ;
+				$header .= "\n".strtolower($header_key) . ':' . $header_value ;
 			}			
 		}
 		$header = substr($header, 1);

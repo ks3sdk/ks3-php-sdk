@@ -129,7 +129,7 @@ class API{
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
 			//将ContentMD5Signer放在最后的原因是，ContentMD5需要根据Content-Length计算
-			"signer"=>"DefaultUserAgentSigner->ACLSigner->SuffixContentTypeSigner->ContentLengthSigner->ObjectMetaSigner->ContentMD5Signer->UserMetaSigner->AdpSigner->CallBackSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->ACLSigner->SuffixContentTypeSigner->ContentLengthSigner->ObjectMetaSigner->ContentMD5Signer->UserMetaSigner->AdpSigner->CallBackSigner->SSESigner->SSECSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->UploadHandler",
 			"body"=>array("position"=>"Content")
 		),
@@ -137,7 +137,7 @@ class API{
 			"method"=>"PUT",
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
-			"signer"=>"DefaultUserAgentSigner->ACLSigner->SuffixContentTypeSigner->ObjectMetaSigner->UserMetaSigner->AdpSigner->CallBackSigner->StreamUploadSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->ACLSigner->SuffixContentTypeSigner->ObjectMetaSigner->UserMetaSigner->AdpSigner->CallBackSigner->SSESigner->SSECSigner->StreamUploadSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->UploadHandler"
 		),
 		"setObjectAcl"=>array(
@@ -152,21 +152,21 @@ class API{
 			"method"=>"PUT",
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
-			"signer"=>"DefaultUserAgentSigner->CopySourceSigner->DefaultContentTypeSigner->HeaderAuthSigner",
-			"handler"=>"ErrorResponseHandler->BooleanHandler"
+			"signer"=>"DefaultUserAgentSigner->CopySourceSigner->DefaultContentTypeSigner->SSESigner->SSECSigner->SSECSourceSigner->HeaderAuthSigner",
+			"handler"=>"ErrorResponseHandler->CopyHandler"
 		),
 		"getObjectMeta"=>array(
 			"method"=>"HEAD",
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
-			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->SSECSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->ObjectMetaHandler"
 		),
 		"objectExists"=>array(
 			"method"=>"HEAD",
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
-			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->SSECSigner->HeaderAuthSigner",
 			"handler"=>"ExistsHandler"
 		),
 		"deleteObject"=>array(
@@ -189,7 +189,7 @@ class API{
 			"method"=>"GET",
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
-			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->RangeSigner->GetObjectSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->RangeSigner->SSECSigner->GetObjectSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->BooleanHandler"
 		),
 		"getObjectAcl" => array(
@@ -205,7 +205,7 @@ class API{
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
 			"subResource"=>"uploads",
-			"signer"=>"DefaultUserAgentSigner->ACLSigner->SuffixContentTypeSigner->MultipartObjectMetaSigner->UserMetaSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->ACLSigner->SuffixContentTypeSigner->MultipartObjectMetaSigner->UserMetaSigner->SSESigner->SSECSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->InitMultipartUploadHandler"
 		),
 		"uploadPart"=>array(
@@ -214,7 +214,7 @@ class API{
 			"needObject"=>TRUE,
 			"queryParams"=>array("!Options->uploadId","!Options->partNumber"),
 			//这个请求没有body，所以使用了ContentLengthSigner->ContentMD5Signer而没用ObjectMetaSigner
-			"signer"=>"DefaultUserAgentSigner->ACLSigner->StreamContentTypeSigner->ContentLengthSigner->ContentMD5Signer->StreamUploadSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->ACLSigner->StreamContentTypeSigner->ContentLengthSigner->ContentMD5Signer->SSECSigner->StreamUploadSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->UploadHandler"
 		),
 		"abortMultipartUpload"=>array(

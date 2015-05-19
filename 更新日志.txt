@@ -1,5 +1,5 @@
 V1.1
 1、添加Ks3EncryptionClient,可以将数据加密之后再上传到服务器上。
-
+2、修复putObjectByFile可能出现的bug
 
 V1.0 初始化版本

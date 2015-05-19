@@ -8,7 +8,7 @@ $client = new Ks3Client("2HITWMQXL2VBB3XMAEHQ","ilZQ9p/NHAK1dOYA/dTKKeIqT/t67rO6
 //print_r(listBuckets($client));
 //print_r(deleteBucket($client));
 //print_r(deleteBucketCORS($client));
-print_r(listObjects($client));
+//print_r(listObjects($client));
 //print_r(getBucketAcl($client));
 //print_r(getBucketCORS($client));
 //print_r(getBucketLocation($client));
@@ -26,7 +26,7 @@ print_r(listObjects($client));
 //print_r(getObjectMeta($client));
 //print_r(setObjectAcl($client));
 //print_r(copyObject($client));
-//print_r(putObjectByFile($client));
+print_r(putObjectByFile($client));
 //print_r(multipartUpload($client));
 //print_r(abortMultipartUpload($client));
 //print_r(generatePresignedUrl($client));
@@ -185,7 +185,7 @@ function copyObject($client){
 	return $client->copyObject($args);
 }
 function putObjectByFile($client){
-	$file = "D://新建文件夹.rar";
+	$file = "D://IMG.jpg";
 	if(Utils::chk_chinese($file)){
 		$file = iconv('utf-8','gbk',$file);
 	}
@@ -195,10 +195,10 @@ function putObjectByFile($client){
 		"Key"=>"stream_upload1.txt",
 		"ACL"=>"public-read",
 		"ObjectMeta"=>array(
-			"Content-Length"=>10//只传0-10字节
+			"Content-Type"=>"image/jpg"//只传0-10字节
 			),
 		"Content"=>array(
-			"content"=>$content,
+			"content"=>fopen($content,"r"),
 			"seek_position"=>0
 			),
 	);

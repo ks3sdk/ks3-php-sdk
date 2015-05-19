@@ -461,11 +461,23 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
             ),
         "WriteTo"=>"D://test.zip" //文件保存路径,必须提供。可以是resource
         );
+
 使用示例:
 
     $client->getObject($args);
 
-##### 5.3.3.2 生成object外链
+##### 5.3.3.2 下载经过客户提供主密钥的服务端加密数据
+参数格式:  
+在原有参数的基础上加上如下
+
+    "SSEC"=>array(
+        "Algm"=>"AES256",
+        "Key"=>"<PUT Object时使用的主密钥>",//
+        "KeyBase64"=>"<PUT Object时使用的主密钥的Base64值>",//Key和KeyBase64提供一个即可
+        "KeyMD5"=>"<PUT Object时使用的主密钥经Base64编码的MD5值>",//可以不指定，SDK将根据Key计算
+        )
+
+##### 5.3.3.3 生成object外链
 参数格式:
 
     $args=array(
@@ -516,7 +528,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
 
     TRUE或者FALSE
 
-##### 5.3.5.1 获取object元数据
+##### 5.3.5.2 获取object元数据
 使用示例:
 
     $client->getObjectMeta($args);
@@ -537,6 +549,16 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
             [x-kss-meta-test] => test
         )
     )
+##### 5.3.5.3 请求经过客户提供主密钥的服务端加密数据
+参数格式:  
+在原有参数的基础上加上如下
+
+    "SSEC"=>array(
+        "Algm"=>"AES256",
+        "Key"=>"<PUT Object时使用的主密钥>",//
+        "KeyBase64"=>"<PUT Object时使用的主密钥的Base64值>",//Key和KeyBase64提供一个即可
+        "KeyMD5"=>"<PUT Object时使用的主密钥经Base64编码的MD5值>",//可以不指定，SDK将根据Key计算
+        )
 
 #### 5.3.6 POST Object
 表单上传文件，用于获取KSSAccessKeyId、Policy和Signature  
@@ -686,6 +708,24 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
 		"BodyVariables"=>array("name"=>"lijunwei")//自定义KS3回调时需要在body中带的参数
 	)
 
+##### 5.3.7.4 上传文件时使用服务端加密
+参数格式:  
+在原有参数的基础上加上如下
+
+    "SSE"=>array(
+        "Algm"=>"<服务端加密算法>"//暂时支持AES256
+    )
+
+##### 5.3.7.5 上传文件时使用客户提供主密钥的服务端加密
+参数格式:  
+在原有参数的基础上加上如下
+
+    "SSEC"=>array(
+        "Algm"=>"AES256",
+        "Key"=>"<主密钥>",//KS3服务端将使用该主密钥对数据进行加密
+        "KeyBase64"=>"<主密钥的Base64>",//Key和KeyBase64提供一个即可
+        "KeyMD5"=>"<主密钥经Base64编码的MD5值>",//可以不指定，SDK将根据Key计算
+        )
 
 #### 5.3.8 PUT Object acl
 设置object的访问权限  
@@ -701,6 +741,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     $client->setObjectAcl ($args);
 
 #### 5.3.9 PUT Object - Copy
+##### 5.3.9.1 基本方法
 拷贝object  
 参数格式: 
 
@@ -716,6 +757,35 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
 使用示例:
 
     $client->copyObject ($args);
+
+##### 5.3.9.2 被拷贝的Object是经过客户提供主密钥服务端加密的
+在原有参数的基础上添加
+
+    "SSECSource"=>array(
+        "Algm"=>"AES256",
+        "Key"=>"<主密钥>",//KS3服务端将使用该主密钥对数据进行解密
+        "KeyBase64"=>"<主密钥的Base64>",//Key和KeyBase64提供一个即可
+        "KeyMD5"=>"<主密钥经Base64编码的MD5值>",//可以不指定，SDK将根据Key计算
+        )
+
+##### 5.3.9.3 Copy后的Object使用服务端加密
+参数格式:  
+在原有参数的基础上加上如下
+
+    "SSE"=>array(
+        "Algm"=>"<服务端加密算法>"//暂时支持AES256
+    )
+
+##### 5.3.9.4 Copy后的Object使用客户提供主密钥的服务端加密
+参数格式:  
+在原有参数的基础上加上如下
+
+    "SSEC"=>array(
+        "Algm"=>"AES256",
+        "Key"=>"<主密钥>",//KS3服务端将使用该主密钥对数据进行加密
+        "KeyBase64"=>"<主密钥的Base64>",//Key和KeyBase64提供一个即可
+        "KeyMD5"=>"<主密钥经Base64编码的MD5值>",//可以不指定，SDK将根据Key计算
+        )
 
 #### 5.3.10 PUT Adp
 添加异步数据处理：  
@@ -761,6 +831,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     $client->getAdp($args);
 
 #### 5.3.12 Initiate Multipart Upload
+##### 5.3.12.1 基本方式
 初始化分块上传  
 参数格式:
 
@@ -787,7 +858,27 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
         [UploadId] => bbdb766a65ef43ebad2b2531739092d0
     )
 
+##### 5.3.12.2 使用服务端加密
+参数格式:  
+在原有参数的基础上加上如下
+
+    "SSE"=>array(
+        "Algm"=>"<服务端加密算法>"//暂时支持AES256
+    )
+
+##### 5.3.12.3 使用客户提供主密钥的服务端加密
+参数格式:  
+在原有参数的基础上加上如下
+
+    "SSEC"=>array(
+        "Algm"=>"AES256",
+        "Key"=>"<主密钥>",//KS3服务端将使用该主密钥对数据进行加密
+        "KeyBase64"=>"<主密钥的Base64>",//Key和KeyBase64提供一个即可
+        "KeyMD5"=>"<主密钥经Base64编码的MD5值>",//可以不指定，SDK将根据Key计算
+        )
+
 #### 5.3.13 Upload Part
+##### 5.3.13.1 基本方式
 上传块  
 参数格式:  
 主要通过seek_position和Content-Length参数控制上传的内容范围
@@ -818,6 +909,18 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     (
         [ETag] => "9430d3a88773837eed6ce0f136770ea3"
     )
+
+##### 5.3.13.2 使用客户提供主密钥的服务端加密
+参数格式:  
+在原有参数的基础上加上如下
+
+    "SSEC"=>array(
+        "Algm"=>"AES256",
+        "Key"=>"<主密钥>",//KS3服务端将使用该主密钥对数据进行加密
+        "KeyBase64"=>"<主密钥的Base64>",//Key和KeyBase64提供一个即可
+        "KeyMD5"=>"<主密钥经Base64编码的MD5值>",//可以不指定，SDK将根据Key计算
+        )
+
 #### 5.3.14 List Parts
 列出一个分块上传已经上传的块  
 参数格式:
