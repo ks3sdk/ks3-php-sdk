@@ -221,6 +221,7 @@ class Ks3Client{
 			{
 				$httpRequest->set_read_stream($read_stream,$read_length);
 				$httpRequest->set_seek_position($seek_position);
+				$httpRequest->remove_header(Headers::$ContentLength);
 			}
 			$write_stream = $request->write_stream;
 			if(isset($write_stream)){
