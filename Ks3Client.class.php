@@ -31,6 +31,7 @@ require_once KS3_API_PATH.DIRECTORY_SEPARATOR."core".DIRECTORY_SEPARATOR."Ks3Req
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."core".DIRECTORY_SEPARATOR."Handlers.php";
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."core".DIRECTORY_SEPARATOR."Builders.php";
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."core".DIRECTORY_SEPARATOR."Logger.php";
+require_once KS3_API_PATH.DIRECTORY_SEPARATOR."core".DIRECTORY_SEPARATOR."MessageHolder.php";
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."RequestCore.class.php";
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."exceptions".DIRECTORY_SEPARATOR."Exceptions.php";
 
@@ -100,14 +101,24 @@ class Ks3Client{
 	getAdp,查询异步数据处理任务
 	*/
 	public function __call($method,$args=array()){
-		$msg = "------------------Logging Start-------------------------\r\n";
-		$msg .= "method->".$method." args->".serialize($args)."\r\n";
-		$result = $this->invoke($method,$args,$msg);
-		$result["msg"] .= "------------------Logging End-------------------------\r\n";
-		$this->log->info($result["msg"]);
-		return $result["data"];
+		$holder = new MessageHolder();
+
+		$holder->msg = "------------------Logging Start-------------------------\r\n";
+		$holder->msg .= "method->".$method." args->".serialize($args)."\r\n";
+		$ex = NULL;
+		try{
+			$result = $this->invoke($method,$args,$holder);
+		}catch(Exception $e){
+			$holder->msg.=$e."\r\n";
+			$ex = $e;
+		}
+		$holder->msg .= "------------------Logging End-------------------------\r\n";
+		$this->log->info($holder->msg);
+		if($ex !=NULL)
+			throw $ex;
+		return $result;
 	}
-	private function invoke($method,$args=array(),$msg,$location=NULL){
+	private function invoke($method,$args=array(),$holder,$location=NULL){
 		if(count($args) !== 0){
 			if(count($args)>1||!is_array($args[0]))
 				throw new Ks3ClientException("this method only needs one array argument");
@@ -219,7 +230,7 @@ class Ks3Client{
 				$signer = new $value();
 				$log = $signer->sign($request,array("accessKey"=>$this->accessKey,"secretKey"=>$this->secretKey,"args"=>$args));
 				if(!empty($log)){
-					$msg.=$log."\r\n";
+					$holder->msg.=$log."\r\n";
 				}
 			}
 		}
@@ -256,11 +267,11 @@ class Ks3Client{
 				$httpRequest->set_write_stream($write_stream);
 			}
 
-			$msg.="request url->".serialize($httpRequest->request_url)."\r\n";
-			$msg.="request headers->".serialize($httpRequest->request_headers)."\r\n";
-			$msg.="request body->".$httpRequest->request_body."\r\n";
-			$msg.="request read stream length->".$read_length."\r\n";
-			$msg.="request read stream seek position->".$seek_position."\r\n";
+			$holder->msg.="request url->".serialize($httpRequest->request_url)."\r\n";
+			$holder->msg.="request headers->".serialize($httpRequest->request_headers)."\r\n";
+			$holder->msg.="request body->".$httpRequest->request_body."\r\n";
+			$holder->msg.="request read stream length->".$read_length."\r\n";
+			$holder->msg.="request read stream seek position->".$seek_position."\r\n";
 			$httpRequest->send_request();
 			//print_r($httpRequest);
 			$body = $httpRequest->get_response_body ();	
@@ -270,25 +281,25 @@ class Ks3Client{
 				$respHeaders = $httpRequest->get_response_header();
 				$location = $respHeaders["location"];
 				if(substr($location,0,4) == "http"){
-					$msg.="response code->".$httpRequest->get_response_code ()."\r\n";
-					$msg.="response headers->".serialize($httpRequest->get_response_header())."\r\n";
-					$msg.="response body->".$body."\r\n";
-					$msg.="retry request to ".$location."\r\n";
+					$holder->msg.="response code->".$httpRequest->get_response_code ()."\r\n";
+					$holder->msg.="response headers->".serialize($httpRequest->get_response_header())."\r\n";
+					$holder->msg.="response body->".$body."\r\n";
+					$holder->msg.="retry request to ".$location."\r\n";
 					//array($args)详见invoke开头
-					return $this->invoke($method,array($args),$msg,$location);
+					return $this->invoke($method,array($args),$holder,$location);
 				}
 			}
-			$msg.="response code->".$httpRequest->get_response_code ()."\r\n";
-			$msg.="response headers->".serialize($httpRequest->get_response_header())."\r\n";
-			$msg.="response body->".$body."\r\n";
+			$holder->msg.="response code->".$httpRequest->get_response_code ()."\r\n";
+			$holder->msg.="response headers->".serialize($httpRequest->get_response_header())."\r\n";
+			$holder->msg.="response body->".$body."\r\n";
 			$handlers = explode("->",$api["handler"]);
 			foreach ($handlers as $key => $value) {
 				$handler = new $value();
 				$data = $handler->handle($data);
 			}
-			return array("msg"=>$msg,"data"=>$data);
+			return $data;
 		}else{
-			return array("msg"=>$msg,"data"=>$request->toUrl($this->endpoint));
+			return $request->toUrl($this->endpoint);
 		}
 	}
 	//用于生产表单上传时的签名信息

@@ -2,7 +2,7 @@
 require_once "../Ks3Client.class.php";
 require_once "../Ks3EncryptionClient.class.php";
 
-$client = new Ks3EncryptionClient("1GL02rRYQxK8s7FQh8dV","2IDjaPOpFfkq5Zf9K4tKu8k5AKApY8S8eKV1zsRl","123");
+$client = new Ks3Client("1GL02rRYQxK8s7FQh8dV","2IDjaPOpFfkq5Zf9K4tKu8k5AKApY8S8eKV1zsRl");
 testObject($client);
 function testObject($client){
 	$bucketName = "phpsdktestlijunwei";

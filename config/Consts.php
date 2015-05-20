@@ -23,25 +23,25 @@ class Consts {
 		"last-modified"=>"Last-Modified",
 		"content-range"=>"Content-Range",
 		"content-length"=>"Content-Length",
-		"x-kss-server-side​-encryption"=>"SSEAlgm",
+		"x-kss-server-side-encryption"=>"SSEAlgm",
 		"x-kss-server-side-encryption-kss-kms-key-id"=>"SSEKMSId",
-		"x-amz-server-side​-encryption​-customer-algorithm"=>"SSECAlgm",
-		"x-amz-server-side​-encryption​-customer-key-md5"=>"SSECKeyMD5"
+		"x-kss-server-side-encryption-customer-algorithm"=>"SSECAlgm",
+		"x-kss-server-side-encryption-customer-key-md5"=>"SSECKeyMD5"
 		);
 	static $PartsElement = array("PartNumber","ETag");
 	static $UploadHandler = array(
 		"etag"=>"ETag",
 		"taskid"=>"TaskID",
-		"x-kss-server-side​-encryption"=>"SSEAlgm",
+		"x-kss-server-side-encryption"=>"SSEAlgm",
 		"x-kss-server-side-encryption-kss-kms-key-id"=>"SSEKMSId",
-		"x-kss-server-side​-encryption​-customer-algorithm"=>"SSECAlgm",
-		"x-kss-server-side​-encryption​-customer-key-md5"=>"SSECKeyMD5"
+		"x-kss-server-side-encryption-customer-algorithm"=>"SSECAlgm",
+		"x-kss-server-side-encryption-customer-key-md5"=>"SSECKeyMD5"
 		);
 	static $SSEHandler = array(
-		"x-kss-server-side​-encryption"=>"SSEAlgm",
+		"x-kss-server-side-encryption"=>"SSEAlgm",
 		"x-kss-server-side-encryption-kss-kms-key-id"=>"SSEKMSId",
-		"x-kss-server-side​-encryption​-customer-algorithm"=>"SSECAlgm",
-		"x-kss-server-side​-encryption​-customer-key-md5"=>"SSECKeyMD5"
+		"x-kss-server-side-encryption-customer-algorithm"=>"SSECAlgm",
+		"x-kss-server-side-encryption-customer-key-md5"=>"SSECKeyMD5"
 		);
 	static $Permission_Read = "READ";
 	static $Permission_Write = "WRITE";

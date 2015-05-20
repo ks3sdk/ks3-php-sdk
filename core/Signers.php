@@ -439,7 +439,7 @@ class SSECSigner{
 				if(empty($algm))
 					$algm = Consts::$SSEDefaultAlgm;
 				if(empty($md5))
-					$md5 = base64_encode(md5($key));
+					$md5 = Utils::hex_to_base64(md5($key));
 
 				$request->addHeader(Headers::$SSECAlgm,$algm);
 				$request->addHeader(Headers::$SSECKey,base64_encode($key));
@@ -466,7 +466,7 @@ class SSECSourceSigner{
 				if(empty($algm))
 					$algm = Consts::$SSEDefaultAlgm;
 				if(empty($md5))
-					$md5 = base64_encode(md5($key));
+					$md5 = Utils::hex_to_base64(md5($key));
 
 				$request->addHeader(Headers::$SSECSourceAlgm,$algm);
 				$request->addHeader(Headers::$SSECSourceKey,base64_encode($key));

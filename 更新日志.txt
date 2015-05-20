@@ -1,5 +1,6 @@
 V1.1
 1、添加Ks3EncryptionClient,可以将数据加密之后再上传到服务器上。
 2、修复putObjectByFile可能出现的bug
+3、SDK添加服务端加密的支持
 
 V1.0 初始化版本
