@@ -200,15 +200,24 @@ class Utils{
    		return (substr($date, 0, strlen($date)-2).'Z');
 	}
 	public static function getFileSize($path){
-		if(is_resource($path))
-		{
+		$success = FALSE;
+		$isresource = FALSE;
+		if(!is_resource($path)){
+			$isresource = FALSE;
 			$resource = fopen($path,"r");
-			$stat = fstat($resource);
-			$size = $stat["size"];
-			if($size<0)
-				throw new Ks3ClientException("please use file path instead resource");
-			return $size;
+		}else{
+			$isresource = TRUE;
+			$resource = $path;
 		}
+		$stat = fstat($resource);
+		$size = $stat["size"];
+		if($size<0){
+			$success = FALSE;
+		}
+		if($success)
+			return $size;
+		else if($isresource)
+			throw new Ks3ClientException("please use file path instead resource");
 		if(!((strtoupper(substr(PHP_OS,0,3))=="WIN"))){//如果不是windows系统，尝试使用stat命令
 			$size=trim(`stat -c%s $path`);
 		}else{//如果是windows系统，尝试cmd命令

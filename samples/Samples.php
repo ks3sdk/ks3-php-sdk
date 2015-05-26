@@ -183,7 +183,7 @@ function copyObject($client){
 	return $client->copyObject($args);
 }
 function putObjectByFile($client){
-	$file = "D://IMG.jpg";
+	$file = "D://phpput";
 	if(Utils::chk_chinese($file)){
 		$file = iconv('utf-8','gbk',$file);
 	}
@@ -193,10 +193,10 @@ function putObjectByFile($client){
 		"Key"=>"stream_upload1.txt",
 		"ACL"=>"public-read",
 		"ObjectMeta"=>array(
-			"Content-Type"=>"image/jpg"//只传0-10字节
+			"Content-Type"=>"image/jpg",//只传0-10字节,
 			),
 		"Content"=>array(
-			"content"=>fopen($content,"r"),
+			"content"=>$file,
 			"seek_position"=>0
 			),
 	);
