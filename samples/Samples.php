@@ -1,6 +1,7 @@
 <?php
 define("USE_HTTPS", TRUE);
 define("VHOST",TRUE);
+define("DEBUG_MODE",TRUE);
 require_once "../Ks3Client.class.php";
 require_once "../core/Utils.class.php";
 

@@ -21,6 +21,9 @@ define("LOG_PATH","");
 //是否使用HTTPS
 if(!defined("USE_HTTPS"))
 define("USE_HTTPS",FALSE);
+//是否开启curl debug模式
+if(!defined("DEBUG_MODE"))
+define("DEBUG_MODE",FALSE);
 define("Author","lijunwei@kingsoft.com");
 define("Version","1.1");
 
@@ -240,6 +243,8 @@ class Ks3Client{
 			if($location!=NULL)
 				$url = $location;
 			$httpRequest = new RequestCore($url);
+			if(DEBUG_MODE===TRUE)
+				$httpRequest->debug_mode=TRUE;
 			$httpRequest->set_method($request->method);
 			foreach ($request->headers as $key => $value) {
 				$httpRequest->add_header($key,$value);
