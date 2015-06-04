@@ -213,6 +213,8 @@ class Utils{
 		$size = $stat["size"];
 		if($size<0){
 			$success = FALSE;
+		}else{
+			$success = TRUE;
 		}
 		if($success)
 			return $size;

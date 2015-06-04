@@ -5,7 +5,7 @@ if(!defined('KS3_API_PATH'))
 define('KS3_API_PATH', dirname(__FILE__));
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."Ks3Client.class.php";
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."encryption".DIRECTORY_SEPARATOR."EncryptionUtil.php";
-require_once KS3_API_PATH.DIRECTORY_SEPARATOR."encryption".DIRECTORY_SEPARATOR."encryptionHandlers.php";
+require_once KS3_API_PATH.DIRECTORY_SEPARATOR."encryption".DIRECTORY_SEPARATOR."EncryptionHandlers.php";
 
 //加密模式
 //暂时仅支持EO,使用AES/CBC/PKCS5Padding算法对数据进行加密
