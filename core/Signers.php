@@ -85,14 +85,18 @@ class QueryAuthSigner implements Signer{
 		$expiresSencond = time()+$expires;
 
 		$resource = AuthUtils::canonicalizedResource($request);
-
 		$signList = array(
-			"GET",
-			"",
-			"",
-			$expiresSencond,
-			$resource
+			$request->method,
+			$request->getHeader(Headers::$ContentMd5),
+			$request->getHeader(Headers::$ContentType),
+			$expiresSencond
 			);
+		$headers = AuthUtils::canonicalizedKssHeaders($request);
+		$resource = AuthUtils::canonicalizedResource($request);
+		if(!empty($headers)){
+			array_push($signList,$headers);
+		}
+		array_push($signList,$resource);
 
 		$stringToSign = join("\n",$signList);
 		$log.= $stringToSign;
@@ -449,7 +453,7 @@ class SSECSigner{
 	}	
 }
 class SSECSourceSigner{
-		public function sign(Ks3Request $request,$args=array()){
+	public function sign(Ks3Request $request,$args=array()){
 		$args = $args["args"];
 		if(isset($args["SSECSource"])){
 			if(isset($args["SSECSource"]["Algm"]))
@@ -471,6 +475,18 @@ class SSECSourceSigner{
 				$request->addHeader(Headers::$SSECSourceAlgm,$algm);
 				$request->addHeader(Headers::$SSECSourceKey,base64_encode($key));
 				$request->addHeader(Headers::$SSECSourceMD5,$md5);
+			}
+		}
+	}
+}
+class AllHeaderSigner{
+	public function sign(Ks3Request $request,$args=array()){
+		print_r($args);
+		$headers = $args["Headers"];
+		print_r($headers);
+		if(!empty($headers)&&is_array($headers)){
+			foreach ($headers as $key => $value) {
+				$request->addHeader($key,$value);
 			}
 		}
 	}

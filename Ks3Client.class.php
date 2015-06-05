@@ -122,45 +122,56 @@ class Ks3Client{
 		return $result;
 	}
 	private function invoke($method,$args=array(),$holder,$location=NULL){
-		if(count($args) !== 0){
-			if(count($args)>1||!is_array($args[0]))
-				throw new Ks3ClientException("this method only needs one array argument");
-			$args = $args[0];
-		}
 		$api = API::$API[$method];
 		if(!$api){
 			throw new Ks3ClientException($method." Not Found API");
+		}
+		if(count($args) !== 0){
+			if(count($args)>1||!is_array($args[0])){
+				var_dump($args);
+				throw new Ks3ClientException("this method only needs one array argument");
+			}
+			$args = $args[0];
 		}
 		if(isset($api["redirect"])){
 			$api = API::$API[$api["redirect"]];
 		}
 		$request = new Ks3Request();
-		if($api["needBucket"]){
-			if(empty($args["Bucket"])){
+		if(empty($args["Bucket"])){
+			if($api["needBucket"]){
 				throw new Ks3ClientException($method." this api need bucket");
-			}else{
-				$request->bucket = $args["Bucket"];
 			}
+		}else{
+			$request->bucket = $args["Bucket"];
 		}
-		if($api["needObject"]){
-			$position = "Key";
-			//position主要为queryadp接口用的
-			if(isset($api["objectPostion"])){
-				$position = $api["objectPostion"];
-			}
-			if(empty($args[$position])){
+		$position = "Key";
+		//position主要为queryadp接口用的
+		if(isset($api["objectPostion"])){
+			$position = $api["objectPostion"];
+		}
+		if(empty($args[$position])){
+			if($api["needObject"]){
 				throw new Ks3ClientException($method." this api need ".$position);
-			}else{
-				$key = $args[$position];
-				if(Utils::is_gb2312($key)){
-					$key = iconv('GB2312', "UTF-8",$key);
-				}elseif(Utils::check_char($key,true)){
-					$key = iconv('GBK', "UTF-8",$key);
-				}
-				$request->key = $key;
 			}
+		}else{
+			$key = $args[$position];
+			if(Utils::is_gb2312($key)){
+				$key = iconv('GB2312', "UTF-8",$key);
+			}elseif(Utils::check_char($key,true)){
+				$key = iconv('GBK', "UTF-8",$key);
+			}
+			$request->key = $key;
 		}
-		$request->method=$api["method"];
+		$method = $api["method"];
+		if($method == "Method"){
+			if(empty($args["Method"])){
+				$request->method="GET";
+			}else{
+				$request->method=$args["Method"];
+			}
+		}else{
+			$request->method=$api["method"];
+		}
 		if(USE_HTTPS)
 			$request->scheme="https://";
 		else
@@ -168,7 +179,11 @@ class Ks3Client{
 		$request->endpoint=$this->endpoint;
 		//add subresource
 		if(!empty($api["subResource"])){
-			$request->subResource=$api["subResource"];
+			if($api["subResource"] == "subResource"){
+				$request->subResource=$args["subResource"];
+			}else{
+				$request->subResource=$api["subResource"];
+			}
 		}
 		//add query params
 		if(isset($api["queryParams"] )){ 
@@ -186,8 +201,20 @@ class Ks3Client{
 					if(!isset($curIndexArg[$value1])){
 						$add = FALSE;
 					}else{
-						$curIndexArg = $curIndexArg[$value1];
 						$curkey = $value1;
+						//星号表示所有,按照暂时的业务，默认星号后面就没了
+						if($curkey == "*"){
+							foreach ($curIndexArg as $queryK => $queryV) {
+								if(!is_array($queryV)){
+									$request->addQueryParams($queryK,$queryV);
+								}
+							}
+							$add = FALSE;
+							$required = FALSE;
+							break;
+						}else{
+							$curIndexArg = $curIndexArg[$value1];
+						}
 					}
 				}
 				if(!empty($curIndexArg)&&$add){
@@ -304,7 +331,9 @@ class Ks3Client{
 			}
 			return $data;
 		}else{
-			return $request->toUrl($this->endpoint);
+			$url = $request->toUrl($this->endpoint);
+			$holder->msg.=$url."\r\n";
+			return $url;
 		}
 	}
 	//用于生产表单上传时的签名信息

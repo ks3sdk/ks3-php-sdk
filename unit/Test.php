@@ -1,7 +1,9 @@
 <?php
 require_once "../Ks3Client.class.php";
 //require_once "../Ks3EncryptionClient.class.php";
+require_once "TestUtil.php";
 require_once "PUnit.php";
+require_once "../lib/RequestCore.class.php";
 class SDKTest extends PUnit{
 	protected $bucket = "php-sdk-test";
 	protected $key = "test";
@@ -162,7 +164,163 @@ class SDKTest extends PUnit{
         $this->assertEquals($meta["ObjectMeta"]["Content-Length"],100,"Content-Length");
         $this->assertEquals($this->client->getObjectAcl(array("Bucket"=>$this->bucket,"Key"=>$this->key)),"public-read","object acl ");
 	}
+	public function testObjectAcl(){
+		$this->client->putObjectByContent(array("Bucket"=>$this->bucket,"Key"=>$this->key,
+"Content"=>"1234"));
+		$this->assertEquals($this->client->getObjectAcl(array("Bucket"=>$this->bucket,"Key"=>$this->key)),"private","object acl");
+		$this->client->setObjectAcl(array("Bucket"=>$this->bucket,"Key"=>$this->key,"ACL"=>"public-read"));
+		$this->assertEquals($this->client->getObjectAcl(array("Bucket"=>$this->bucket,"Key"=>$this->key)),"public-read","object acl");
+	}
+	public function testDeleteObject(){
+		$this->client->putObjectByContent(array("Bucket"=>$this->bucket,"Key"=>$this->key,
+"Content"=>"1234"));
+		$this->client->deleteObject(array("Bucket"=>$this->bucket,"Key"=>$this->key));
+		$this->assertEquals($this->client->objectExists(array("Bucket"=>$this->bucket,"Key"=>$this->key)),FALSE,"object exits");
+	}
+	public function testDeleteObjects(){
+		$this->client->putObjectByContent(array("Bucket"=>$this->bucket,"Key"=>$this->key,
+"Content"=>"1234"));
+		$this->client->deleteObjects(array("Bucket"=>$this->bucket,"DeleteKeys"=>array($this->key)));
+		$this->assertEquals($this->client->objectExists(array("Bucket"=>$this->bucket,"Key"=>$this->key)),FALSE,"object exits");		
+	}
+	public function testCopyObject(){
+		$this->client->putObjectByContent(array("Bucket"=>$this->bucket,"Key"=>$this->key,
+"Content"=>"1234"));
+		$this->client->copyObject(array("Bucket"=>$this->bucket,"Key"=>$this->key_copy,"CopySource"=>array("Bucket"=>$this->bucket,"Key"=>$this->key)));
+		$this->assertEquals($this->client->objectExists(array("Bucket"=>$this->bucket,"Key"=>$this->key)),TRUE,"object exits");
+		$this->assertEquals($this->client->objectExists(array("Bucket"=>$this->bucket,"Key"=>$this->key_copy)),TRUE
+			,"object exits");
+	}
+	public function testPutAndGetObject(){
+		$args = array(
+        	"Bucket"=>$this->bucket,
+        	"Key"=>$this->key,
+        	"Content"=>array(
+        		"content"=>$this->cachedir."test_file"
+        	),//要上传的内容
+        	"ACL"=>"public-read",//可以设置访问权限,合法值,private、public-read
+        	"ObjectMeta"=>array(
+            	"Content-Type"=>"application/xml",
+            ),
+        	"UserMeta"=>array(//可以设置object的用户元数据，需要以x-kss-meta-开头
+            	"x-kss-meta-test"=>"test"
+            )
+        );
+        $this->client->putObjectByFile($args);
+        $this->client->getObject(array("Bucket"=>$this->bucket,"Key"=>$this->key,"WriteTo"=>$this->cachedir."down"));
+        $md5 = md5_file($this->cachedir."down");
+        $md5pre = md5_file($this->cachedir."test_file");
+        @unlink($this->cachedir."down");
+        $this->assertEquals($md5,$md5pre,"contentmd5");
+	}
+	public function testPutAndGetObjectRanges(){
+		$args = array(
+        	"Bucket"=>$this->bucket,
+        	"Key"=>$this->key,
+        	"Content"=>array(
+        		"content"=>$this->cachedir."test_file"
+        	),//要上传的内容
+        	"ACL"=>"public-read",//可以设置访问权限,合法值,private、public-read
+        	"ObjectMeta"=>array(
+            	"Content-Type"=>"application/xml",
+            ),
+        	"UserMeta"=>array(//可以设置object的用户元数据，需要以x-kss-meta-开头
+            	"x-kss-meta-test"=>"test"
+            )
+        );
+        $this->client->putObjectByFile($args);
+        rangeGetAndCheckMd5($this->client,$this->bucket,$this->key,$this->cachedir."down",md5_file($this->cachedir."test_file"));
+	}
+	public function testInitAndAbortMultipart(){
+		$initResult = $this->client->initMultipartUpload(array("Bucket"=>$this->bucket,"Key"=>$this->key));
+		$uid = $initResult["UploadId"];
+		$listParts = $this->client->listParts(array("Bucket"=>$this->bucket,"Key"=>$this->key,"Options"=>array("uploadId"=>$uid)));
+		$this->client->abortMultipartUpload(array("Bucket"=>$this->bucket,"Key"=>$this->key,"Options"=>array("uploadId"=>$uid)));
+		$ex = NULL;
+		try{
+			$this->client->listParts(array("Bucket"=>$this->bucket,"Key"=>$this->key,"Options"=>array("uploadId"=>$uid)));
+		}catch(Exception $e){
+			$ex = $e;
+		}
+		if($ex == NULL||!($ex->errorCode === "NoSuchUpload")){
+			throw new Exception("create bucket expected NoSuchUpload but ".$ex);
+		}
+	}
+	public function testMultipartUpload(){
+		generateFile(1024*1024,$this->cachedir."multi");
+		//初始化分开上传，获取uploadid
+        $args = array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key,
+            "ACL"=>"public-read",
+            "UserMeta"=>array(
+            	"x-kss-meta-test"=>"example"
+            ),
+        "ObjectMeta"=>array(
+            "Content-Type"=>"application/xml"
+            )
+        );
+        $uploadid = $this->client->initMultipartUpload($args);
+        $uploadid = $uploadid["UploadId"];//获取到uploadid
+        //开始上传
+        $file = $this->cachedir."multi";//要上传的文件
+        $partsize = 1024*100;
+        $resource = fopen($file,"r");
+        $stat = fstat($resource);
+        $total = $stat["size"];//获取文件的总大小
+        fclose($resource);
+        $count = (int)($total/$partsize+1);//计算文件需要分几块上传
+        for($i = 0;$i < $count;$i++){
+            //依次上传每一块
+            $args=array(
+                "Bucket"=>$this->bucket,
+                "Key"=>$this->key,
+                "Options"=>array(
+                    "partNumber"=>$i+1,
+                    "uploadId"=>$uploadid
+                ),
+                "ObjectMeta"=>array(
+                    "Content-Length"=>min($partsize,$total-$partsize*$i)//每次上传$partsize大小
+                ),
+                "Content"=>array(
+                    "content"=>$file,
+                    "seek_position"=>$partsize*$i//跳过之前已经上传的
+                )
+            );
+            $etag = $this->client->uploadPart($args);
+            $etag = $etag["ETag"];
+        }
+        $parts = $this->client->listParts(array("Bucket"=>$this->bucket,"Key"=>$this->key,"Options"=>array("uploadId"=>$uploadid)));
+        //结束上传
+        $args=array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key,
+            "Options"=>array("uploadId"=>$uploadid),
+            "Parts"=>$parts["Parts"]//使用之前列出的块完成分开上传
+        );
+        $result = $this->client->completeMultipartUpload($args);
+        $this->assertEquals($this->client->getObjectAcl(array("Bucket"=>$this->bucket,"Key"=>$this->key)),"public-read","object acl");
+        $meta = $this->client->getObjectMeta(array("Bucket"=>$this->bucket,"Key"=>$this->key));
+        $this->assertEquals($meta["ObjectMeta"]["Content-Type"],"application/xml","Content-Type");
+        $this->assertEquals($meta["ObjectMeta"]["Content-Length"],filesize($this->cachedir."multi"),"Content-Length");
+        $this->assertEquals($meta["UserMeta"]["x-kss-meta-test"],"example","x-kss-meta-test");
+        rangeGetAndCheckMd5($this->client,$this->bucket,$this->key,$this->cachedir."down",md5_file($this->cachedir."multi"));
+        @unlink($this->cachedir."multi");
+	}
+	public function testListBucketsPresignedUrl(){
+		$url = $this->client->generatePresignedUrl(
+			array(
+				"Method"=>"GET",
+				"Options"=>array("Expires"=>60*10),
+				"Headers"=>array("Content-Type"=>"text/plain")
+				));
+		$httpRequest = new RequestCore($url);
+		$httpRequest->set_method("GET");
+		$httpRequest->send_request();
+		$body = $httpRequest->get_response_body ();	
+		$this->assertEquals($httpRequest->get_response_code()." body:".$body,200,"list buckets status code");
+	}
 }
 $test = new SDKTest();
-$test->doTest();
+$test->run();
 ?>

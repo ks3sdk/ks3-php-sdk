@@ -243,12 +243,12 @@ class API{
 			"body"=>array("builder"=>"CompleteMultipartUploadBuilder")
 		),
 		"generatePresignedUrl"=>array(
-			"method"=>"GET",
-			"needBucket"=>TRUE,
-			"needObject"=>TRUE,
-			"queryParams"=>array("!Options->Expires","Options->response-content-type","Options->response-content-encoding","Options->response-content-disposition",
-				"Options->response-content-language","Options->response-expires","Options->response-cache-control"),
-			"signer"=>"QueryAuthSigner",
+			"method"=>"Method",
+			"needBucket"=>FALSE,
+			"needObject"=>FALSE,
+			"subResource"=>"subResource",
+			"queryParams"=>array("!Options->Expires","Options->*"),
+			"signer"=>"AllHeaderSigner->QueryAuthSigner",
 		),
 		"putAdp"=>array(
 			"method"=>"PUT",

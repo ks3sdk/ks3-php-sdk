@@ -5,7 +5,7 @@ class PUnit{
 			throw new Exception($info." expected ".$expected." but ".$value);
 		}
 	}
-	function doTest(){
+	function run(){
    		$r = new ReflectionClass($this);
     	foreach($r->getMethods() as $key=>$methodObj){
       	  	if($methodObj->isPrivate())
