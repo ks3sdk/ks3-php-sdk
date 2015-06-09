@@ -5,7 +5,7 @@ class PUnit{
 			throw new Exception($info." expected ".$expected." but ".$value);
 		}
 	}
-	function run(){
+	function run($torun = NULL){
    		$r = new ReflectionClass($this);
     	foreach($r->getMethods() as $key=>$methodObj){
       	  	if($methodObj->isPrivate())
@@ -31,6 +31,10 @@ class PUnit{
        	$success = array();
        	foreach ($methods as $method) {
        		if($method["class"] != "PUnit"&&substr($method["name"],0,4) == "test"){
+            if($torun !== NULL){
+              if(!in_array($method["name"],$torun))
+                continue;
+            }
        			try{
        				if($method["type"] == "public"){
                 if($before!=NULL)

@@ -6,8 +6,8 @@ require_once "PUnit.php";
 require_once "../lib/RequestCore.class.php";
 class SDKTest extends PUnit{
 	protected $bucket = "php-sdk-test";
-	protected $key = "test";
-	protected $key_copy = "test_copy";
+	protected $key = "test中/文？";
+	protected $key_copy = "test中/文_copy？";
 	protected $accesskey = "lMQTr0hNlMpB0iOk/i+x";
 	protected $secrectkey = "D4CsYLs75JcWEjbiI22zR3P7kJ/+5B1qdEje7A7I";
 	protected $client;
@@ -316,11 +316,30 @@ class SDKTest extends PUnit{
 				));
 		$httpRequest = new RequestCore($url);
 		$httpRequest->set_method("GET");
+        $httpRequest->add_header("Content-Type","text/plain");
 		$httpRequest->send_request();
 		$body = $httpRequest->get_response_body ();	
 		$this->assertEquals($httpRequest->get_response_code()." body:".$body,200,"list buckets status code");
 	}
+    public function testHeadBucketPresignedUrl(){
+        $url = $this->client->generatePresignedUrl(
+            array(
+                "Method"=>"HEAD",
+                "Options"=>array("Expires"=>60*10),
+                "Headers"=>array("Content-Type"=>"text/plain")
+                )
+            );
+        $httpRequest = new RequestCore($url);
+        $httpRequest->set_method("HEAD");
+        $httpRequest->add_header("Content-Type","text/plain");
+        $httpRequest->send_request();
+        $body = $httpRequest->get_response_body (); 
+        $this->assertEquals($httpRequest->get_response_code()." body:".$body,200,"head bucket status code");
+    }
 }
 $test = new SDKTest();
+$methods = array(
+    "testHeadBucketPresignedUrl"
+    );
 $test->run();
 ?>
