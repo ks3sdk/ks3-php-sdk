@@ -45,6 +45,10 @@ if(function_exists('get_loaded_extensions')){
 		if(!in_array('curl', $extensions)){
 			throw new Ks3ClientException("please install curl extension");
 		}
+		if(!in_array('mbstring', $extensions)){
+			throw new Ks3ClientException("please install mbstring extension");
+			
+		}
 	}else{
 		throw new Ks3ClientException("please install extensions");
 	}
@@ -155,13 +159,10 @@ class Ks3Client{
 			}
 		}else{
 			$key = $args[$position];
-			$preEncoding = mb_detect_encoding($key);
+			$preEncoding = mb_detect_encoding($key, array("ASCII","UTF-8","GB2312","GBK","BIG5"));
+			$holder->msg.="key encoding ".$preEncoding."\r\n";
 			if(strtolower($preEncoding) != "utf-8"){
-				if(Utils::is_gb2312($key)){
-					$key = iconv('GB2312', "UTF-8",$key);
-				}elseif(Utils::check_char($key,false)){
-					$key = iconv('GBK', "UTF-8",$key);
-				}
+				$key = iconv($preEncoding, "UTF-8",$key);
 			}
 			$request->key = $key;
 		}
