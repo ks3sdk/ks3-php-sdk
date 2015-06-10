@@ -1,4 +1,5 @@
 <?php
+require_once "../core/Logger.php";
 class PUnit{
 	function assertEquals($value,$expected,$info = NULL){
 		if($value != $expected){
@@ -8,7 +9,7 @@ class PUnit{
 	function run($torun = NULL){
    		$r = new ReflectionClass($this);
     	foreach($r->getMethods() as $key=>$methodObj){
-      	  	if($methodObj->isPrivate())
+      	  if($methodObj->isPrivate())
            		 $methods[$key]['type'] = 'private';
         	elseif($methodObj->isProtected())
         	     $methods[$key]['type'] = 'protected';
@@ -37,6 +38,8 @@ class PUnit{
             }
        			try{
        				if($method["type"] == "public"){
+                $log = new Logger();
+                $log->info("Run unit --->".$method["name"]);
                 if($before!=NULL)
                   $this->$before["name"]();
        					$this->$method["name"]();

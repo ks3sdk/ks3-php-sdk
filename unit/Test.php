@@ -886,7 +886,7 @@ class SDKTest extends PUnit{
 $test = new SDKTest();
 $methods = array(
     //"testRangeGetFile",
-    "testMultipartUploadUsingEncyptionMeta"
+    "testPutObjectSSECAndGetHeadObject"
     );
 $test->run();
 ?>
