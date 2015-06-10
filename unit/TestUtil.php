@@ -7,7 +7,7 @@ function rangeGetAndCheckMd5($client,$bucket,$key,$file,$expectedMd5){
 	$filelist = array();
 
 	for($begin = 0;$begin <$contentlength;){
-		$index = rand((int)($contentlength/20),(int)($contentlength/10));
+		$index = rand((int)($contentlength/20),(int)($contentlength/4));
 		$range = array("start"=>$begin,"end"=>$begin+$index);
 		$destFile = $file.$begin."-".($begin+$index);
 		array_push($filelist,$destFile);
@@ -29,12 +29,16 @@ function rangeGetAndCheckMd5($client,$bucket,$key,$file,$expectedMd5){
 			file_put_contents($file,$content,FILE_APPEND);
 		}
 		fclose($handle);
-		@unlink($value);
+		//@unlink($value);
 	}
 	$md5 = md5_file($file);
-	@unlink($file);	
+	//@unlink($file);	
 	if($md5 != $expectedMd5)
 		throw new Exception("file md5 check error expected ".$expectedMd5." ,actual ".$md5, 1);
+	foreach ($filelist as $key => $value) {
+		@unlink($value);
+	}
+	@unlink($file);
 }
 function generateFile($sizeInBytes,$destFile){
 	for($i = 0;$i < $sizeInBytes/10;$i++){

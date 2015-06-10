@@ -36,6 +36,10 @@ class AESCBCStreamWriteCallBack{
 		if($length<$blocksize)
 			$this->buffer = $data;
 		else{
+			//如果期望的范围之后还有数据，则认为数据已经接收完毕。不做任何处理
+			if($this->expectedRange["end"] <= $this->expectedRange["start"]){
+				return $written_total+strlen($data);
+			}
 			$this->buffer = substr($data,$length - $length%$blocksize);
 			$data = substr($data,0,$length - $length%$blocksize);
 		
@@ -81,17 +85,23 @@ class AESCBCStreamWriteCallBack{
 			$startOffset = 0;
 			$endOffset = 0;
 			if(isset($this->expectedRange)){
-				$expectedEnd = $this->expectedRange["end"];
+				$trueEnd = $expectedEnd = $this->expectedRange["end"];
+
 				if($this->currentIndex+strlen($decoded)>$expectedEnd){
 					$preLength = strlen($decoded);
 					$decoded = substr($decoded, 0,$expectedEnd-$this->currentIndex+1);
 					$endOffset = $preLength-strlen($decoded);
+				}else{
+					//因为range是开始结束都计算的，range=1-2。currentIndex=1,长度是2，end=currentIndex+2-1
+					$trueEnd = $this->currentIndex+strlen($decoded)-1; 
 				}
 				$expectedStart = $this->expectedRange["start"];
 				if($this->currentIndex<$expectedStart){
 					$decoded = substr($decoded,$expectedStart - $this->currentIndex);
 					$startOffset = $expectedStart - $this->currentIndex;
 				}
+				//调整下次期望的开始
+				$this->expectedRange["start"] = $trueEnd+1;
 			}
 			$padOffset = 0;
 			//再次根据截取的长度判断是否需要删除最后填充的字符

@@ -1,6 +1,7 @@
 <?php
+require_once "../encryption/EncryptionUtil.php";
 require_once "../Ks3Client.class.php";
-//require_once "../Ks3EncryptionClient.class.php";
+require_once "../Ks3EncryptionClient.class.php";
 require_once "TestUtil.php";
 require_once "PUnit.php";
 require_once "../lib/RequestCore.class.php";
@@ -11,6 +12,7 @@ class SDKTest extends PUnit{
 	protected $accesskey = "lMQTr0hNlMpB0iOk/i+x";
 	protected $secrectkey = "D4CsYLs75JcWEjbiI22zR3P7kJ/+5B1qdEje7A7I";
 	protected $client;
+    protected $encryptionClient;
 	protected $cachedir;
     protected $sseckey;
 	public function __construct(){
@@ -21,6 +23,7 @@ class SDKTest extends PUnit{
         $sseckey = fread($handle, filesize ($filename));
         fclose($handle);
         $this->sseckey = $sseckey;
+        $this->encryptionClient = new Ks3EncryptionClient($this->accesskey,$this->secrectkey,$sseckey);
 	}
 	public function before(){
 		if($this->client->bucketExists(array("Bucket"=>$this->bucket))){
@@ -796,10 +799,94 @@ class SDKTest extends PUnit{
             );
         $result = $this->client->copyObject($args);
     }
+    public function testPutObjectByContentAndGetObjectUsingEncyptionMeta(){
+        for($i = 45 ;$i < 60;$i++){
+
+            $content = EncryptionUtil::genereateOnceUsedKey($i);
+
+            $args = array(
+                "Bucket"=>$this->bucket,
+                "Key"=>$this->key,
+                "ACL"=>"public-read",
+                "Content"=>$content
+            );
+            $this->encryptionClient->putObjectByContent($args);
+            rangeGetAndCheckMd5($this->encryptionClient,$this->bucket,$this->key,
+               $this->cachedir."down",md5($args["Content"]));
+        }
+    }
+    public function testPutObjectByFileAndGetObjectUsingEncyptionMeta(){
+        $args = array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key,
+            "ACL"=>"public-read",
+            "Content"=>array(
+                "content"=>$this->cachedir."test_file"
+            )
+        );
+        $this->encryptionClient->putObjectByFile($args);
+        rangeGetAndCheckMd5($this->encryptionClient,$this->bucket,$this->key,
+               $this->cachedir."down",md5_file($this->cachedir."test_file"));
+    }
+    public function testMultipartUploadUsingEncyptionMeta(){
+        generateFile(1024*1024,$this->cachedir."multi");
+        //初始化分开上传，获取uploadid
+        $args = array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key,
+        );
+        $uploadid = $this->encryptionClient->initMultipartUpload($args);
+        $uploadid = $uploadid["UploadId"];//获取到uploadid
+        //开始上传
+
+        $file = $this->cachedir."multi";//要上传的文件
+        $partsize = 1024*100;
+        $resource = fopen($file,"r");
+        $stat = fstat($resource);
+        $total = $stat["size"];//获取文件的总大小
+        fclose($resource);
+        $count = (int)($total/$partsize+1);//计算文件需要分几块上传
+        for($i = 0;$i < $count;$i++){
+            //依次上传每一块
+            echo "upload".$i."\r\n";
+            $args=array(
+                "Bucket"=>$this->bucket,
+                "Key"=>$this->key,
+                "LastPart"=>($i===$count-1),
+                "Options"=>array(
+                    "partNumber"=>$i+1,
+                    "uploadId"=>$uploadid
+                ),
+                "ObjectMeta"=>array(
+                    "Content-Length"=>min($partsize,$total-$partsize*$i)//每次上传$partsize大小
+                ),
+                "Content"=>array(
+                    "content"=>$file,
+                    "seek_position"=>$partsize*$i//跳过之前已经上传的
+                )
+            );
+            $etag = $this->encryptionClient->uploadPart($args);
+            $etag = $etag["ETag"];
+        }
+        $parts = $this->encryptionClient->listParts(array("Bucket"=>$this->bucket,"Key"=>$this->key,"Options"=>array("uploadId"=>$uploadid)));
+        //结束上传
+        $args=array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key,
+            "Options"=>array("uploadId"=>$uploadid),
+            "Parts"=>$parts["Parts"]//使用之前列出的块完成分开上传
+        );
+        $result = $this->encryptionClient->completeMultipartUpload($args);
+
+        rangeGetAndCheckMd5($this->encryptionClient,$this->bucket,$this->key,
+            $this->cachedir."down",md5_file($file));
+        @unlink($this->cachedir."multi");
+    }
 }
 $test = new SDKTest();
 $methods = array(
-    "testPutObjectSSECAndGetHeadObject"
+    //"testRangeGetFile",
+    "testMultipartUploadUsingEncyptionMeta"
     );
-$test->run();
+$test->run($methods);
 ?>
