@@ -34,7 +34,6 @@ class SDKTest extends PUnit{
 			$this->client->createBucket(array("Bucket"=>$this->bucket));
 		}
 	}
-	public function after(){}
 	public function testListBuckets(){
 		$buckets = $this->client->listBuckets();
 		$found = FALSE;

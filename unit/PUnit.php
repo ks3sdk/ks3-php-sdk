@@ -44,10 +44,7 @@ class PUnit{
        				}
        			}catch(Exception $e){
        				$error[$method["name"]]="".$e;
-       			}finally{
-              if($after!=NULL)
-                $this->$after["name"]();
-            }
+       			}
        		}
        	}
        	echo "\r\nPHP Unit-----------error"."\r\n";
