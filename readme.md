@@ -1149,9 +1149,9 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
         "Method"="GET",//http请求方法
         "Bucket"=>"<bucket>",
         "Key"=>"<key>",
-        "subResource"=>"<subResource>",
         "Options"=>array(
             "Expires"=><过期时间,单位秒,即x秒后过期>
+            //其他参数...
             ),
         "Headers"=>array(
             //"Content-Type"=>"...",

@@ -12,9 +12,15 @@ class SDKTest extends PUnit{
 	protected $secrectkey = "D4CsYLs75JcWEjbiI22zR3P7kJ/+5B1qdEje7A7I";
 	protected $client;
 	protected $cachedir;
+    protected $sseckey;
 	public function __construct(){
 		$this->client=new Ks3Client($this->accesskey,$this->secrectkey);
 		$this->cachedir=KS3_API_PATH.DIRECTORY_SEPARATOR."unit".DIRECTORY_SEPARATOR."cache".DIRECTORY_SEPARATOR;
+        $filename = "secret.key";
+        $handle = fopen($filename, "r");
+        $sseckey = fread($handle, filesize ($filename));
+        fclose($handle);
+        $this->sseckey = $sseckey;
 	}
 	public function before(){
 		if($this->client->bucketExists(array("Bucket"=>$this->bucket))){
@@ -325,6 +331,7 @@ class SDKTest extends PUnit{
         $url = $this->client->generatePresignedUrl(
             array(
                 "Method"=>"HEAD",
+                "Bucket"=>$this->bucket,
                 "Options"=>array("Expires"=>60*10),
                 "Headers"=>array("Content-Type"=>"text/plain")
                 )
@@ -336,10 +343,464 @@ class SDKTest extends PUnit{
         $body = $httpRequest->get_response_body (); 
         $this->assertEquals($httpRequest->get_response_code()." body:".$body,200,"head bucket status code");
     }
+    public function testDeleteBucketPresignedUrl(){
+        $this->client->putObjectByContent(array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key,
+            "Content"=>"123"
+            )
+            );
+        $url = $this->client->generatePresignedUrl(
+            array(
+                "Method"=>"DELETE",
+                "Bucket"=>$this->bucket,
+                "Options"=>array("Expires"=>60*10),
+                "Headers"=>array("Content-Type"=>"text/plain")
+                )
+            );
+        $httpRequest = new RequestCore($url);
+        $httpRequest->set_method("DELETE");
+        $httpRequest->add_header("Content-Type","text/plain");
+        $httpRequest->send_request();
+        $body = $httpRequest->get_response_body (); 
+        $this->assertEquals($httpRequest->get_response_code()." body:".$body,409,"delete bucket status code");      
+    }
+    public function testGetBucketAclPresignedUrl(){
+        $url = $this->client->generatePresignedUrl(
+            array(
+                "Method"=>"GET",
+                "Bucket"=>$this->bucket,
+                "Options"=>array("Expires"=>60*10,"acl"=>NULL),
+                "Headers"=>array("Content-Type"=>"text/plain")
+                )
+            );
+        $httpRequest = new RequestCore($url);
+        $httpRequest->set_method("GET");
+        $httpRequest->add_header("Content-Type","text/plain");
+        $httpRequest->send_request();
+        $body = $httpRequest->get_response_body (); 
+        $this->assertEquals($httpRequest->get_response_code()." body:".$body,200,"get bucket acl status code");      
+    }
+    public function testPutBucketPresignedUrl(){
+        $url = $this->client->generatePresignedUrl(
+            array(
+                "Method"=>"PUT",
+                "Bucket"=>$this->bucket,
+                "Options"=>array("Expires"=>60*10),
+                "Headers"=>array("Content-Type"=>"text/plain")
+                )
+            );
+        $httpRequest = new RequestCore($url);
+        $httpRequest->set_method("PUT");
+        $httpRequest->add_header("Content-Type","text/plain");
+        $httpRequest->send_request();
+        $body = $httpRequest->get_response_body (); 
+        $this->assertEquals($httpRequest->get_response_code()." body:".$body,409,"delete bucket status code");      
+    }
+    public function testPutBucketAclPresignedUrl(){
+        $url = $this->client->generatePresignedUrl(
+            array(
+                "Method"=>"PUT",
+                "Bucket"=>$this->bucket,
+                "Options"=>array("Expires"=>60*10,"acl"=>NULL),
+                "Headers"=>array("Content-Type"=>"text/plain","x-kss-acl"=>"public-read")
+                )
+            );
+        $httpRequest = new RequestCore($url);
+        $httpRequest->set_method("PUT");
+        $httpRequest->add_header("Content-Type","text/plain");
+        $httpRequest->add_header("x-kss-acl","public-read");
+        $httpRequest->send_request();
+        $body = $httpRequest->get_response_body (); 
+        $this->assertEquals($httpRequest->get_response_code()." body:".$body,200,"put bucket acl status code"); 
+        $this->assertEquals($this->client->getBucketAcl(array("Bucket"=>$this->bucket)),"public-read","bucket acl");
+    }
+    public function testListObjectsPresignedUrl(){
+        $url = $this->client->generatePresignedUrl(array(
+            "Method"=>"GET",
+            "Bucket"=>$this->bucket,
+            "Options"=>array("Expires"=>60*10,"delimiter"=>"/"),
+            "Headers"=>array("Content-Type"=>"text/plain")
+            )
+        );
+        $httpRequest = new RequestCore($url);
+        $httpRequest->set_method("GET");
+        $httpRequest->add_header("Content-Type","text/plain");
+        $httpRequest->send_request();
+        $body = $httpRequest->get_response_body (); 
+        $this->assertEquals($httpRequest->get_response_code()." body:".$body,200,"list objects status code"); 
+    }
+    public function testGetBucketLoggingPresignedUrl(){
+        $url = $this->client->generatePresignedUrl(array(
+            "Method"=>"GET",
+            "Bucket"=>$this->bucket,
+            "Options"=>array("Expires"=>60*10,"logging"=>""),
+            "Headers"=>array("Content-Type"=>"text/plain")
+            )
+        );
+        $httpRequest = new RequestCore($url);
+        $httpRequest->set_method("GET");
+        $httpRequest->add_header("Content-Type","text/plain");
+        $httpRequest->send_request();
+        $body = $httpRequest->get_response_body (); 
+        $this->assertEquals($httpRequest->get_response_code()." body:".$body,200,"get bucket logging status code"); 
+    }
+    public function testPutBucketLoggingPresignedUrl(){
+        $xml = new SimpleXmlElement('<BucketLoggingStatus xmlns="http://s3.amazonaws.com/doc/2006-03-01/" />');
+        $xml = $xml->asXml();
+        $url = $this->client->generatePresignedUrl(
+            array(
+                "Method"=>"PUT",
+                "Bucket"=>$this->bucket,
+                "Options"=>array("Expires"=>60*10,"logging"=>NULL),
+                "Headers"=>array("Content-Type"=>"application/xml")
+            )
+        );
+        $httpRequest = new RequestCore($url);
+        $httpRequest->set_method("PUT");
+        $httpRequest->add_header("Content-Type","application/xml");
+        $httpRequest->add_header("Content-Length",strlen($xml));
+        $httpRequest->request_body=$xml;
+        $httpRequest->send_request();
+        $body = $httpRequest->get_response_body (); 
+        $this->assertEquals($httpRequest->get_response_code()." body:".$body,200,"put bucket logging status code"); 
+    }
+    public function testGetBucketLocationPresignedUrl(){
+        $url = $this->client->generatePresignedUrl(
+            array(
+                "Method"=>"GET",
+                "Bucket"=>$this->bucket,
+                "Options"=>array("Expires"=>60*10,"location"=>NULL),
+                "Headers"=>array("Content-Type"=>"text/plain")
+            )
+        );
+        $httpRequest = new RequestCore($url);
+        $httpRequest->set_method("GET");
+        $httpRequest->add_header("Content-Type","text/plain");
+        $httpRequest->send_request();
+        $body = $httpRequest->get_response_body (); 
+        $this->assertEquals($httpRequest->get_response_code()." body:".$body,200,"get bucket location status code"); 
+    }
+    public function testDeleteObjectPresignedUrl(){
+        $this->client->putObjectByContent(array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key,
+            "Content"=>"123"
+            )
+        );
+        $url = $this->client->generatePresignedUrl(
+            array(
+                "Method"=>"DELETE",
+                "Bucket"=>$this->bucket,
+                "Key"=>$this->key,
+                "Options"=>array("Expires"=>60*10),
+                "Headers"=>array("Content-Type"=>"text/plain")
+            )
+        );
+        $httpRequest = new RequestCore($url);
+        $httpRequest->set_method("DELETE");
+        $httpRequest->add_header("Content-Type","text/plain");
+        $httpRequest->send_request();
+        $body = $httpRequest->get_response_body (); 
+        $this->assertEquals($httpRequest->get_response_code()." body:".$body,204,"delete object status code"); 
+    }
+    public function testGetObjectPresignedUrl(){
+        $this->client->putObjectByContent(array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key,
+            "Content"=>"123"
+            )
+        );
+        $url = $this->client->generatePresignedUrl(
+            array(
+                "Bucket"=>$this->bucket,
+                "Key"=>$this->key,
+                "Options"=>array("Expires"=>60*10),
+                "Headers"=>array("Content-Type"=>"text/plain")
+            )
+        );
+        $httpRequest = new RequestCore($url);
+        $httpRequest->set_method("GET");
+        $httpRequest->add_header("Content-Type","text/plain");
+        $httpRequest->send_request();
+        $body = $httpRequest->get_response_body (); 
+        $this->assertEquals($httpRequest->get_response_code()." body:".$body,200,"get object status code"); 
+        $this->assertEquals($body,"123","get object body"); 
+    }
+    public function testPutObjectPresignedUrl(){
+        $body = "123";
+        $url = $this->client->generatePresignedUrl(
+            array(
+                "Method"=>"PUT",
+                "Bucket"=>$this->bucket,
+                "Key"=>$this->key,
+                "Options"=>array("Expires"=>60*10),
+                "Headers"=>array("Content-Type"=>"application/ocet-stream")
+            )
+        );
+        $httpRequest = new RequestCore($url);
+        $httpRequest->set_method("PUT");
+        $httpRequest->add_header("Content-Type","application/ocet-stream");
+        $httpRequest->add_header("Content-Length",strlen($body));
+        $httpRequest->request_body=$body;
+        $httpRequest->send_request();
+        $body = $httpRequest->get_response_body (); 
+        $this->assertEquals($httpRequest->get_response_code()." body:".$body,200,"put object status code"); 
+    }
+    public function testHeadObjectPresignedUrl(){
+        $this->testPutObjectPresignedUrl();
+        $url = $this->client->generatePresignedUrl(
+            array(
+                "Method"=>"HEAD",
+                "Bucket"=>$this->bucket,
+                "Key"=>$this->key,
+                "Options"=>array("Expires"=>60*10),
+                "Headers"=>array("Content-Type"=>"text/plain")
+            )
+        );
+        $httpRequest = new RequestCore($url);
+        $httpRequest->set_method("HEAD");
+        $httpRequest->add_header("Content-Type","text/plain");
+        $httpRequest->send_request();
+        $body = $httpRequest->get_response_body (); 
+        $this->assertEquals($httpRequest->get_response_code()." body:".$body,200,"head object status code"); 
+    }
+    public function testGetObjectAclPresignedUrl(){
+        $this->testPutObjectPresignedUrl();
+        $url = $this->client->generatePresignedUrl(
+            array(
+                "Method"=>"GET",
+                "Bucket"=>$this->bucket,
+                "Key"=>$this->key,
+                "Options"=>array("Expires"=>60*10,"acl"=>NULL),
+                "Headers"=>array("Content-Type"=>"text/plain")
+            )
+        );
+        $httpRequest = new RequestCore($url);
+        $httpRequest->set_method("GET");
+        $httpRequest->add_header("Content-Type","text/plain");
+        $httpRequest->send_request();
+        $body = $httpRequest->get_response_body (); 
+        $this->assertEquals($httpRequest->get_response_code()." body:".$body,200,"get object acl status code");         
+    }
+    public function testPutObjectAclPresignedUrl(){
+        $this->testPutObjectPresignedUrl();
+        $url = $this->client->generatePresignedUrl(
+            array(
+                "Method"=>"PUT",
+                "Bucket"=>$this->bucket,
+                "Key"=>$this->key,
+                "Options"=>array("Expires"=>60*10,"acl"=>NULL),
+                "Headers"=>array("Content-Type"=>"text/plain","x-kss-acl"=>"public-read")
+            )
+        );
+        $httpRequest = new RequestCore($url);
+        $httpRequest->set_method("PUT");
+        $httpRequest->add_header("Content-Type","text/plain");
+        $httpRequest->add_header("x-kss-acl","public-read");
+        $httpRequest->send_request();
+        $body = $httpRequest->get_response_body (); 
+        $this->assertEquals($httpRequest->get_response_code()." body:".$body,200,"put object acl status code");         
+    }
+    public function testPutObjectSSEAndGetHeadObject(){
+        $args = array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key,
+            "Content"=>"12345",//要上传的内容
+             "ACL"=>"public-read",//可以设置访问权限,合法值,private、public-read
+             "ObjectMeta"=>array(//设置object的元数据,可以设置"Cache-Control","Content-Disposition","Content-Encoding","Content-Length","Content-MD5","Content-Type","Expires"。当设置了Content-Length时，请勿大于实际长度，如果小于实际长度，将只上传部分内容。
+                "Content-Type"=>"binay/ocet-stream"
+            ),
+            "UserMeta"=>array(//可以设置object的用户元数据，需要以x-kss-meta-开头
+              "x-kss-meta-test"=>"test"
+            ),
+            "SSE"=>array(
+                "Algm"=>"AES256"//暂时支持AES256
+             )
+        );
+        $result = $this->client->putObjectByContent($args);
+        $this->assertEquals($result["SSEAlgm"],"AES256");
+
+        $args = array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key
+            );
+        $result = $this->client->getObjectMeta($args);
+        $this->assertEquals($result["ObjectMeta"]["SSEAlgm"],"AES256");
+        rangeGetAndCheckMd5($this->client,$this->bucket,$this->key,$this->cachedir."down",md5("12345"));
+    }
+    public function testPutObjectSSECAndGetHeadObject(){
+        $args = array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key,
+            "Content"=>"12345",//要上传的内容
+             "ACL"=>"public-read",//可以设置访问权限,合法值,private、public-read
+             "ObjectMeta"=>array(//设置object的元数据,可以设置"Cache-Control","Content-Disposition","Content-Encoding","Content-Length","Content-MD5","Content-Type","Expires"。当设置了Content-Length时，请勿大于实际长度，如果小于实际长度，将只上传部分内容。
+                "Content-Type"=>"binay/ocet-stream"
+            ),
+            "UserMeta"=>array(//可以设置object的用户元数据，需要以x-kss-meta-开头
+              "x-kss-meta-test"=>"test"
+            ),
+            "SSEC"=>array(
+                "Key"=>$this->sseckey
+             )
+        );
+        $result = $this->client->putObjectByContent($args);
+        $this->assertEquals($result["SSECAlgm"],"AES256");
+        $this->assertEquals($result["SSECKeyMD5"],Utils::hex_to_base64(md5($this->sseckey)));
+
+        $args = array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key,
+            "SSEC"=>array(
+                "Key"=>$this->sseckey
+             )
+            );
+        $result = $this->client->getObjectMeta($args);
+        $this->assertEquals($result["ObjectMeta"]["SSECAlgm"],"AES256");
+        $this->assertEquals($result["ObjectMeta"]["SSECKeyMD5"],Utils::hex_to_base64(md5($this->sseckey)));
+
+        $args = array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key,
+            "WriteTo"=>$this->cachedir."down", //文件保存路径,必须提供。可以是resource
+            "SSEC"=>array(
+                "Key"=>$this->sseckey
+             )
+        );
+        $this->client->getObject($args);
+        $this->assertEquals("12345",file_get_contents($this->cachedir."down"));
+        @unlink($this->cachedir."down");
+    }
+    public function testMultipartUploadSSE(){
+        $file = $this->cachedir."test_file";
+        $args = array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key,
+            "SSE"=>array(
+                "Algm"=>"AES256"
+                )
+        );
+        $uploadid = $this->client->initMultipartUpload($args);
+
+        $this->assertEquals($uploadid["SSEAlgm"],"AES256");
+
+        $uploadid = $uploadid["UploadId"];
+        //开始上传
+        $args=array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key,
+            "Options"=>array(
+                "partNumber"=>1,
+                "uploadId"=>$uploadid
+                ),
+            "Content"=>array(
+                "content"=>$file
+                )
+            );
+        $etag = $this->client->uploadPart($args);
+
+        $this->assertEquals($etag["SSEAlgm"],"AES256");
+        $etag = $etag["ETag"];
+
+        $parts = $this->client->listParts(array("Bucket"=>$this->bucket,"Key"=>$this->key,"Options"=>array("uploadId"=>$uploadid)));
+        //结束上传
+        $args=array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key,
+            "Options"=>array("uploadId"=>$uploadid),
+            "Parts"=>$parts["Parts"],
+        );
+        $result = $this->client->completeMultipartUpload($args);
+        $this->assertEquals($result["SSEAlgm"],"AES256");
+    }
+    public function testMultipartUploadSSEC(){
+        $file = $this->cachedir."test_file";
+        $args = array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key,
+            "SSEC"=>array(
+                "Key"=>$this->sseckey
+                )
+        );
+        $uploadid = $this->client->initMultipartUpload($args);
+
+        $this->assertEquals($uploadid["SSECAlgm"],"AES256");
+        $this->assertEquals($uploadid["SSECKeyMD5"],Utils::hex_to_base64(md5($this->sseckey)));
+
+        $uploadid = $uploadid["UploadId"];
+        //开始上传
+        $args=array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key,
+            "Options"=>array(
+                "partNumber"=>1,
+                "uploadId"=>$uploadid
+                ),
+            "Content"=>array(
+                "content"=>$file
+                ),
+            "SSEC"=>array(
+                "Key"=>$this->sseckey
+                )
+            );
+        $etag = $this->client->uploadPart($args);
+
+        $this->assertEquals($etag["SSECAlgm"],"AES256");
+        $this->assertEquals($etag["SSECKeyMD5"],Utils::hex_to_base64(md5($this->sseckey)));
+
+        $etag = $etag["ETag"];
+
+        $parts = $this->client->listParts(array("Bucket"=>$this->bucket,"Key"=>$this->key,"Options"=>array("uploadId"=>$uploadid)));
+        //结束上传
+        $args=array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key,
+            "Options"=>array("uploadId"=>$uploadid),
+            "Parts"=>$parts["Parts"],
+        );
+        $result = $this->client->completeMultipartUpload($args);
+        $this->assertEquals($result["SSECAlgm"],"AES256");
+        $this->assertEquals($result["SSECKeyMD5"],Utils::hex_to_base64(md5($this->sseckey)));
+    }
+    public function testCopySSECObject(){
+        $args = array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key,
+            "Content"=>"12345",//要上传的内容
+             "ACL"=>"public-read",//可以设置访问权限,合法值,private、public-read
+             "ObjectMeta"=>array(//设置object的元数据,可以设置"Cache-Control","Content-Disposition","Content-Encoding","Content-Length","Content-MD5","Content-Type","Expires"。当设置了Content-Length时，请勿大于实际长度，如果小于实际长度，将只上传部分内容。
+                "Content-Type"=>"binay/ocet-stream"
+            ),
+            "UserMeta"=>array(//可以设置object的用户元数据，需要以x-kss-meta-开头
+              "x-kss-meta-test"=>"test"
+            ),
+            "SSEC"=>array(
+                "Key"=>$this->sseckey
+             )
+        );
+        $result = $this->client->putObjectByContent($args);
+
+        $args = array(
+            "Bucket"=>$this->bucket,
+            "Key"=>"copy".$this->key_copy,
+            "CopySource"=>array(
+                "Bucket"=>$this->bucket,
+                "Key"=>$this->key
+                ),
+             "SSECSource"=>array(
+                "Key"=>$this->sseckey
+                ),
+             "SSEC"=>array(
+                "Key"=>$this->sseckey
+                )
+            );
+        $result = $this->client->copyObject($args);
+    }
 }
 $test = new SDKTest();
 $methods = array(
-    "testHeadBucketPresignedUrl"
+    "testPutObjectSSECAndGetHeadObject"
     );
 $test->run();
 ?>

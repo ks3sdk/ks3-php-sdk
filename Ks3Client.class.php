@@ -182,11 +182,7 @@ class Ks3Client{
 		$request->endpoint=$this->endpoint;
 		//add subresource
 		if(!empty($api["subResource"])){
-			if($api["subResource"] == "subResource"){
-				$request->subResource=$args["subResource"];
-			}else{
-				$request->subResource=$api["subResource"];
-			}
+			$request->subResource=$api["subResource"];
 		}
 		//add query params
 		if(isset($api["queryParams"] )){ 
@@ -201,7 +197,7 @@ class Ks3Client{
 				$add = TRUE;
 				$curkey = "";
 				foreach ($index as $key1 => $value1) {
-					if(!isset($curIndexArg[$value1])){
+					if(!isset($curIndexArg[$value1])&&$value1 !== "*"){
 						$add = FALSE;
 					}else{
 						$curkey = $value1;

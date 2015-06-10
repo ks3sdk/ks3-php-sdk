@@ -246,7 +246,6 @@ class API{
 			"method"=>"Method",
 			"needBucket"=>FALSE,
 			"needObject"=>FALSE,
-			"subResource"=>"subResource",
 			"queryParams"=>array("!Options->Expires","Options->*"),
 			"signer"=>"AllHeaderSigner->QueryAuthSigner",
 		),
