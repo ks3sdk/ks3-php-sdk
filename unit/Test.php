@@ -888,5 +888,5 @@ $methods = array(
     //"testRangeGetFile",
     "testMultipartUploadUsingEncyptionMeta"
     );
-$test->run($methods);
+$test->run();
 ?>
