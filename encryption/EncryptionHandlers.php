@@ -161,7 +161,8 @@ class EncryptionEO implements EncryptionHandler{
 				$encrypted =FALSE;
 			}
 		}
-
+		//是否为下载到文件中
+		$isWriteToFile=FALSE;
 		if($encrypted)
 		{
 			$iv = $encryptionInfo["iv"];
@@ -196,21 +197,90 @@ class EncryptionEO implements EncryptionHandler{
 				}
 			}
 
-			$writeCallBack = new AESCBCStreamWriteCallBack();
-			$writeCallBack->iv=$iv;
-			$writeCallBack->cek=$cek;
-			$writeCallBack->contentLength = $meta["ObjectMeta"]["Content-Length"];
-			if(isset($range)){
+			$isWriteToFile = isset($args["WriteTo"]);
+			$contentLength = $meta["ObjectMeta"]["Content-Length"];
+			if($isWriteToFile){
+				$writeCallBack = new AESCBCStreamWriteCallBack();
+				$writeCallBack->iv=$iv;
+				$writeCallBack->cek=$cek;
+				$writeCallBack->contentLength = $contentLength;
+				if(isset($range)){
+					$blocksize = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128,MCRYPT_MODE_CBC);
+					$adjustedRange = EncryptionUtil::getAdjustedRange($range,$blocksize);
+					$writeCallBack->expectedRange = $range;
+					$writeCallBack->adjustedRange = $adjustedRange;
+					$args["Range"]=$adjustedRange;
+				}
+				$args["writeCallBack"] = $writeCallBack;
+				return $this->ks3client->getObject($args);
+			}else{
+				$offset = 0;
 				$blocksize = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128,MCRYPT_MODE_CBC);
-				$adjustedRange = EncryptionUtil::getAdjustedRange($range,$blocksize);
-				$writeCallBack->expectedRange = $range;
-				$writeCallBack->adjustedRange = $adjustedRange;
+				if(isset($range)){
+					$adjustedRange = EncryptionUtil::getAdjustedRange($range,$blocksize);
+					$args["Range"]=$adjustedRange;
+				}
+				$s3Object = $this->ks3client->getObject($args);
+				$content = $s3Object["Content"];
 
-				$args["Range"]=$adjustedRange;
+				if(isset($range)){
+					if($adjustedRange["start"] > 0){
+						$iv = substr($content,0,$blocksize);
+						$content = substr($content,$blocksize);
+						$offset = $blocksize+$adjustedRange["start"];
+					}
+				}
+				if(!empty($content)){
+					$td = mcrypt_module_open(MCRYPT_RIJNDAEL_128,'',MCRYPT_MODE_CBC,'');
+					mcrypt_generic_init($td,$cek,$iv);
+					$decoded = mdecrypt_generic($td,$content);
+					mcrypt_generic_deinit($td);
+					mcrypt_module_close($td);
+				}else{
+					$decoded = "";
+				}
+
+				//判断是否需要删除最后填充的字符,以及获取填充的字符
+				$needRemovePad = FALSE;
+				$pad = NULL;
+				if($offset+strlen($decoded) >=$contentLength){
+					$needRemovePad = TRUE;
+					$pad = ord(substr($decoded,strlen($decoded)-1,1));
+					if($pad<=0||$pad>$blocksize)
+					{
+						//invalid pad
+						$needRemovePad = FALSE;
+					}
+				}
+				$endOffset = 0;
+				if(isset($range)){
+					if($offset+strlen($decoded)>$range["end"]){
+						$preLength = strlen($decoded);
+						$decoded = substr($decoded, 0,$range["end"]-$offset+1);
+						$endOffset = $preLength-strlen($decoded);
+					}
+					if($offset<$range["start"]){
+						$decoded = substr($decoded,$range["start"] - $offset);
+					}
+				}
+				//再次根据截取的长度判断是否需要删除最后填充的字符
+				if($needRemovePad&&$endOffset > $pad){
+					$needRemovePad = FALSE;
+				}
+				if($needRemovePad){
+					$padOffset = $pad-$endOffset;
+					$actualWriteCount = strlen($decoded)-$padOffset;
+					if($actualWriteCount <= 0)//负数的情况就是用户期望的range里全是填充的
+						$decoded = "";
+					else
+						$decoded = substr($decoded,0,strlen($decoded)-$padOffset);
+				}
+				$s3Object["Content"] = $decoded;
+				return $s3Object;
 			}
-			$args["writeCallBack"] = $writeCallBack;
+		}else{
+			return $this->ks3client->getObject($args);
 		}
-		return $this->ks3client->getObject($args);
 	}
 	public function initMultipartUploadSecurely($args=array()){
 		$sek = EncryptionUtil::genereateOnceUsedKey();

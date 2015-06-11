@@ -459,12 +459,35 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
             "start"=>1,
             "end"=>4,
             ),
-        "WriteTo"=>"D://test.zip" //文件保存路径,必须提供。可以是resource
+        "WriteTo"=>"D://test.zip" //文件保存路径,可以不提供。可以是resource
         );
 
 使用示例:
 
     $client->getObject($args);
+
+返回结果格式(当不提供WriteTo时会有该返回结果):
+
+    Array
+    (
+        [Content] => "1234"//文件内容
+        [Meta] => Array
+        (
+            [ObjectMeta] => Array   //元数据
+            (  
+                [Content-Type] => binay/ocet-stream
+                [Content-Length] => 4
+                [ETag] => "81dc9bdb52d04dc20036dbd8313ed055"
+                [Last-Modified] => Sat, 21 Mar 2015 06:31:28 GMT
+            )
+            [UserMeta] => Array    //用户自定义元数据
+            (
+                [x-kss-meta-test] => test
+            )
+        )
+    )
+
+
 
 ##### 5.3.3.2 下载经过客户提供主密钥的服务端加密数据
 参数格式:  

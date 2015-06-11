@@ -314,8 +314,6 @@ class GetObjectSigner{
 				}
 				$request->write_stream = fopen($WriteTo,"w");
 			}
-		}else{
-			throw new Ks3ClientException("argument WriteTo is needed");
 		}
 	}
 }

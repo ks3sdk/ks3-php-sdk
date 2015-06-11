@@ -37,7 +37,7 @@ class AESCBCStreamWriteCallBack{
 			$this->buffer = $data;
 		else{
 			//如果期望的范围之后还有数据，则认为数据已经接收完毕。不做任何处理
-			if($this->expectedRange["end"] <= $this->expectedRange["start"]){
+			if($this->expectedRange["end"] < $this->expectedRange["start"]){
 				return $written_total+strlen($data);
 			}
 			$this->buffer = substr($data,$length - $length%$blocksize);
@@ -62,16 +62,16 @@ class AESCBCStreamWriteCallBack{
 
 			$td = mcrypt_module_open(MCRYPT_RIJNDAEL_128,'',MCRYPT_MODE_CBC,'');
 			mcrypt_generic_init($td,$this->cek,$this->iv);
-
 			$decoded = mdecrypt_generic($td,$data);
+
 			mcrypt_generic_deinit($td);
 			mcrypt_module_close($td);
 
 			$this->iv = substr($data,strlen($data)-$blocksize);
-
 			//判断是否需要删除最后填充的字符,以及获取填充的字符
 			$needRemovePad = FALSE;
 			$pad = NULL;
+
 			if($this->currentIndex+strlen($decoded) >=$this->contentLength){
 				$needRemovePad = TRUE;
 				$pad = ord(substr($decoded,strlen($decoded)-1,1));
@@ -81,6 +81,7 @@ class AESCBCStreamWriteCallBack{
 					$needRemovePad = FALSE;
 				}
 			}
+
 			//将解密后的数据截取到期望的长度
 			$startOffset = 0;
 			$endOffset = 0;
@@ -103,11 +104,13 @@ class AESCBCStreamWriteCallBack{
 				//调整下次期望的开始
 				$this->expectedRange["start"] = $trueEnd+1;
 			}
+
 			$padOffset = 0;
 			//再次根据截取的长度判断是否需要删除最后填充的字符
 			if($needRemovePad&&$endOffset > $pad){
 				$needRemovePad = FALSE;
 			}
+			$actualWriteCount = 0;
 			if($needRemovePad){
 				$padOffset = $pad-$endOffset;
 				$actualWriteCount = strlen($decoded)-$padOffset;

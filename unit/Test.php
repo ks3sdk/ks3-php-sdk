@@ -126,7 +126,7 @@ class SDKTest extends PUnit{
 		$location = $this->client->getBucketLocation(array("Bucket"=>$this->bucket));
 		$this->assertEquals($location,"HANGZHOU","bucket location ");
 	}
-	public function testPutObjectByContent(){
+	public function testPutObjectByContentAndGetObjectContent(){
 		$args = array(
         	"Bucket"=>$this->bucket,
         	"Key"=>$this->key,
@@ -147,6 +147,14 @@ class SDKTest extends PUnit{
         $this->assertEquals($meta["ObjectMeta"]["Content-Type"],"application/xml","Content-Type");
         $this->assertEquals($meta["ObjectMeta"]["Content-Length"],3,"Content-Length");
         $this->assertEquals($this->client->getObjectAcl(array("Bucket"=>$this->bucket,"Key"=>$this->key)),"public-read","object acl ");
+
+        $s3Object = $this->client->getObject(array("Bucket"=>$this->bucket,"Key"=>$this->key));
+        $this->assertEquals($s3Object["Content"],"1234","s3 object content");
+        $meta = $s3Object["Meta"];
+        $this->assertEquals($meta["UserMeta"]["x-kss-meta-test"],"test","x-kss-meta-test");
+        $this->assertEquals($meta["ObjectMeta"]["Content-Type"],"application/xml","Content-Type");
+        $this->assertEquals($meta["ObjectMeta"]["Content-Length"],3,"Content-Length");
+
 	}
 	public function testPutObjectByFile(){
 		$args = array(
@@ -882,11 +890,36 @@ class SDKTest extends PUnit{
             $this->cachedir."down",md5_file($file));
         @unlink($this->cachedir."multi");
     }
+    public function testPutObjectByContentAndGetObject(){
+        @unlink($this->cachedir."down");
+        $content = EncryptionUtil::genereateOnceUsedKey(500);
+        $args = array(
+            "Bucket"=>$this->bucket,
+            "Key"=>$this->key,
+            "ACL"=>"public-read",
+            "Content"=>$content
+        );
+        $this->encryptionClient->putObjectByContent($args);
+
+       // for(;;){
+            @unlink($this->cachedir."down");
+            $start = 517;//(int)rand(0,520);
+            $end = 519;//(int)rand($start,520);
+            echo $start."-".$end;
+            $s3Object = $this->encryptionClient->getObject(
+            array("Bucket"=>$this->bucket,"Key"=>$this->key,
+                "WriteTo"=>$this->cachedir."down",
+                "Range"=>"bytes=".$start."-".$end)
+            );
+            print_r($s3Object);
+        //    $this->assertEquals(substr($content,$start,$end-$start+1),file_get_contents($this->cachedir."down"));
+        //}
+    }
 }
 $test = new SDKTest();
 $methods = array(
     //"testRangeGetFile",
-    "testPutObjectSSECAndGetHeadObject"
+    "testPutObjectByContentAndGetObject"
     );
-$test->run();
+$test->run($methods );
 ?>

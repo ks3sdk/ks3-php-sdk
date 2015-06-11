@@ -190,7 +190,7 @@ class API{
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
 			"signer"=>"DefaultUserAgentSigner->DefaultContentTypeSigner->RangeSigner->SSECSigner->GetObjectSigner->HeaderAuthSigner",
-			"handler"=>"ErrorResponseHandler->BooleanHandler"
+			"handler"=>"ErrorResponseHandler->getObjectHandler"
 		),
 		"getObjectAcl" => array(
 			"method"=>"GET",
