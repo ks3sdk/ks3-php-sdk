@@ -495,7 +495,7 @@ class AuthUtils{
 		ksort($headers,SORT_STRING);
 		foreach ( $headers as $header_key => $header_value ) {
 			if (substr(strtolower($header_key), 0, 6) === Consts::$KS3HeaderPrefix){
-				$header .= "\n".$header_key . ':' . $header_value ;
+				$header .= "\n".strtolower($header_key) . ':' .$header_value;
 			}			
 		}
 		$header = substr($header, 1);

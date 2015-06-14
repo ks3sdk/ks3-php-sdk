@@ -1,4 +1,5 @@
 <?php
+define("ENCRYPTPTION_STORAGE_MODE","InstructionFile");
 require_once "../encryption/EncryptionUtil.php";
 require_once "../Ks3Client.class.php";
 require_once "../Ks3EncryptionClient.class.php";
@@ -149,7 +150,7 @@ class SDKTest extends PUnit{
         $this->assertEquals($this->client->getObjectAcl(array("Bucket"=>$this->bucket,"Key"=>$this->key)),"public-read","object acl ");
 
         $s3Object = $this->client->getObject(array("Bucket"=>$this->bucket,"Key"=>$this->key));
-        $this->assertEquals($s3Object["Content"],"1234","s3 object content");
+        $this->assertEquals($s3Object["Content"],"123","s3 object content");
         $meta = $s3Object["Meta"];
         $this->assertEquals($meta["UserMeta"]["x-kss-meta-test"],"test","x-kss-meta-test");
         $this->assertEquals($meta["ObjectMeta"]["Content-Type"],"application/xml","Content-Type");
@@ -900,20 +901,13 @@ class SDKTest extends PUnit{
             "Content"=>$content
         );
         $this->encryptionClient->putObjectByContent($args);
-
-       // for(;;){
-            @unlink($this->cachedir."down");
-            $start = 517;//(int)rand(0,520);
-            $end = 519;//(int)rand($start,520);
-            echo $start."-".$end;
-            $s3Object = $this->encryptionClient->getObject(
-            array("Bucket"=>$this->bucket,"Key"=>$this->key,
-                "WriteTo"=>$this->cachedir."down",
-                "Range"=>"bytes=".$start."-".$end)
-            );
-            print_r($s3Object);
-        //    $this->assertEquals(substr($content,$start,$end-$start+1),file_get_contents($this->cachedir."down"));
-        //}
+        $start = (int)rand(0,520);
+        $end = (int)rand($start,520);
+        $s3Object = $this->encryptionClient->getObject(
+        array("Bucket"=>$this->bucket,"Key"=>$this->key,
+            "Range"=>"bytes=".$start."-".$end)
+        );
+        $this->assertEquals(substr($content,$start,$end-$start+1),$s3Object["Content"]);
     }
 }
 $test = new SDKTest();
@@ -921,5 +915,5 @@ $methods = array(
     //"testRangeGetFile",
     "testPutObjectByContentAndGetObject"
     );
-$test->run($methods );
+$test->run();
 ?>

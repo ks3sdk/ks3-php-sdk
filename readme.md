@@ -19,14 +19,20 @@
 ### 3.2 获取秘钥
 1、开通KS3服务，[http://www.ksyun.com/user/register](http://www.ksyun.com/user/register) 注册账号  
 2、进入控制台, [http://ks3.ksyun.com/console.html#/setting](http://ks3.ksyun.com/console.html#/setting) 获取AccessKeyID 、AccessKeySecret
-### 3.3 日志配置
-在Ks3Client.php中  
+### 3.3 配置
+在引用Ks3Client.class.php文件前定义  
+//是否使用VHOST  
+define("KS3_API_VHOST",FALSE);    
 //是否开启日志(写入日志文件)  
-define("LOG",TRUE);  
+define("KS3_API_LOG",TRUE);  
 //是否显示日志(直接输出日志)  
-define("DISPLAY_LOG", TRUE);  
+define("KS3_API_DISPLAY_LOG", TRUE);    
 //定义日志目录(默认是该项目log下)  
-define("LOG_PATH","");  
+define("KS3_API_LOG_PATH","");  
+//是否使用HTTPS  
+define("KS3_API_USE_HTTPS",FALSE);  
+//是否开启curl debug模式  
+define("KS3_API_DEBUG_MODE",FALSE);  
 
 ### 3.4 初始化客户端
 当以上全部完成之后用户便可初始化客户端进行操作了  

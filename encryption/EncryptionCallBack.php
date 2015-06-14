@@ -30,7 +30,7 @@ class AESCBCStreamWriteCallBack{
 		$data = $this->buffer.$data;
 
 		$length = strlen($data);
-		//不能把上次的没读完的长度算在这次里
+		//不能把上次的没读完的长度算在这次里,应该算在上次
 		$written_total = 0-strlen($this->buffer);
 		$blocksize = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128,MCRYPT_MODE_CBC);
 		if($length<$blocksize)
@@ -59,13 +59,16 @@ class AESCBCStreamWriteCallBack{
 					$this->currentIndex = $ivoffset;
 			}
 			$written_total+=$ivoffset;
-
-			$td = mcrypt_module_open(MCRYPT_RIJNDAEL_128,'',MCRYPT_MODE_CBC,'');
-			mcrypt_generic_init($td,$this->cek,$this->iv);
-			$decoded = mdecrypt_generic($td,$data);
-
-			mcrypt_generic_deinit($td);
-			mcrypt_module_close($td);
+			if(strlen($data) == 0){
+				$decoded = "";
+				return $written_total;
+			}else{
+				$td = mcrypt_module_open(MCRYPT_RIJNDAEL_128,'',MCRYPT_MODE_CBC,'');
+				mcrypt_generic_init($td,$this->cek,$this->iv);
+				$decoded = mdecrypt_generic($td,$data);
+				mcrypt_generic_deinit($td);
+				mcrypt_module_close($td);
+			}
 
 			$this->iv = substr($data,strlen($data)-$blocksize);
 			//判断是否需要删除最后填充的字符,以及获取填充的字符

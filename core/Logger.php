@@ -16,8 +16,8 @@ class Logger{
 	private function log($level,$msg){
 		$date = gmdate('D, d M Y H:i:s \G\M\T');
 		$log = $date." ".$level."\r\n".$msg."\r\n";
-		if(defined('LOG_PATH') ){
-			$log_path = LOG_PATH;
+		if(defined('KS3_API_LOG_PATH') ){
+			$log_path = KS3_API_LOG_PATH;
 			if(empty($log_path)){
 				$log_path = KS3_API_PATH.DIRECTORY_SEPARATOR.'log'.DIRECTORY_SEPARATOR;
 			}
@@ -32,11 +32,11 @@ class Logger{
 
 		$log_name = $log_path.'ks3_php_sdk_'.date('Y-m-d').'.log';
 
-		if(DISPLAY_LOG){
+		if(KS3_API_DISPLAY_LOG){
 			echo $log;
 		}
 		
-		if(LOG){
+		if(KS3_API_LOG){
 			if(!error_log($log,3,$log_name)){
 				throw new Ks3ClientException("write to log file error");
 			}

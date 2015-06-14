@@ -134,23 +134,16 @@ class EncryptionEO implements EncryptionHandler{
 				"Key"=>$args["Key"].EncryptionUtil::$INSTRUCTION_SUFFIX)
 				)
 			){
-				$cacheDir = KS3_API_PATH.DIRECTORY_SEPARATOR."cache".DIRECTORY_SEPARATOR;
-				$encryptionDir = KS3_API_PATH.DIRECTORY_SEPARATOR."cache".DIRECTORY_SEPARATOR."encryption".DIRECTORY_SEPARATOR;
-				if(!is_dir($cacheDir))
-					mkdir($cacheDir);
-				if(!is_dir($encryptionDir))
-					mkdir($encryptionDir);
 				$insKey = $args["Key"].EncryptionUtil::$INSTRUCTION_SUFFIX;
 				$getIns = array(
 					"Bucket"=>$args["Bucket"],
 					"Key"=>$insKey,
-					"WriteTo"=>$encryptionDir.base64_encode($insKey));
-				if(!EncryptionUtil::isInstructionFile($args["Bucket"],$insKey,$this->ks3client))
+				);
+				$s3Object = $this->ks3client->getObject($getIns);
+				if(!EncryptionUtil::isInstructionFile($s3Object))
 					throw new Ks3ClientException($insKey." is not an InstructionFile");
-				$this->ks3client->getObject($getIns);
 
-				$content = file_get_contents($encryptionDir.base64_encode($insKey));
-				@unlink($encryptionDir.base64_encode($insKey));
+				$content = $s3Object["Content"];
 				$content = json_decode($content,TRUE);
 				$encryptionInfo["iv"] = base64_decode($content["x-kss-iv"]);
 				$matdesc =$content["x-kss-matdesc"];

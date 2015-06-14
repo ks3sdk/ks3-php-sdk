@@ -54,7 +54,7 @@ class Ks3Request{
 		$key = $this->key;
 		$subResource = $this->subResource;
 		if(!empty($bucket)){
-			if(VHOST){
+			if(KS3_API_VHOST){
 				$url.=$bucket.".".$endpoint;
 			}else{
 				$url.=$endpoint."/".$bucket;

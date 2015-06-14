@@ -7,25 +7,25 @@ date_default_timezone_set('Asia/Shanghai');
 if(!defined("KS3_API_PATH"))
 define("KS3_API_PATH", dirname(__FILE__));
 //是否使用VHOST
-if(!defined("VHOST"))
-define("VHOST",FALSE);
+if(!defined("KS3_API_VHOST"))
+define("KS3_API_VHOST",FALSE);
 //是否开启日志(写入日志文件)
-if(!defined("LOG"))
-define("LOG",TRUE);
+if(!defined("KS3_API_LOG"))
+define("KS3_API_LOG",TRUE);
 //是否显示日志(直接输出日志)
-if(!defined("DISPLAY_LOG"))
-define("DISPLAY_LOG", TRUE);
+if(!defined("KS3_API_DISPLAY_LOG"))
+define("KS3_API_DISPLAY_LOG", TRUE);
 //定义日志目录(默认是该项目log下)
-if(!defined("LOG_PATH"))
-define("LOG_PATH","");
+if(!defined("KS3_API_LOG_PATH"))
+define("KS3_API_LOG_PATH","");
 //是否使用HTTPS
-if(!defined("USE_HTTPS"))
-define("USE_HTTPS",FALSE);
+if(!defined("KS3_API_USE_HTTPS"))
+define("KS3_API_USE_HTTPS",FALSE);
 //是否开启curl debug模式
-if(!defined("DEBUG_MODE"))
-define("DEBUG_MODE",FALSE);
-define("Author","lijunwei@kingsoft.com");
-define("Version","1.1");
+if(!defined("KS3_API_DEBUG_MODE"))
+define("KS3_API_DEBUG_MODE",FALSE);
+define("KS3_API_Author","lijunwei@kingsoft.com");
+define("KS3_API_Version","1.1");
 
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."config".DIRECTORY_SEPARATOR."Consts.php";
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."core".DIRECTORY_SEPARATOR."API.php";
@@ -176,7 +176,7 @@ class Ks3Client{
 		}else{
 			$request->method=$api["method"];
 		}
-		if(USE_HTTPS)
+		if(KS3_API_USE_HTTPS)
 			$request->scheme="https://";
 		else
 			$request->scheme="http://";
@@ -270,7 +270,7 @@ class Ks3Client{
 			if($location!=NULL)
 				$url = $location;
 			$httpRequest = new RequestCore($url);
-			if(DEBUG_MODE===TRUE)
+			if(KS3_API_DEBUG_MODE===TRUE)
 				$httpRequest->debug_mode=TRUE;
 			$httpRequest->set_method($request->method);
 			foreach ($request->headers as $key => $value) {

@@ -264,13 +264,13 @@ class EncryptionUtil{
 			"Key"=>$key,
 			"Content"=>$instruction,
 			"UserMeta"=>array(
-				"x-kss-meta-x-kss-crypto-instr-file"=>$key
+				"x-kss-meta-x-kss-crypto-instr-file"=>base64_encode($key)
 				)
 			);
 		return $req;
 	}
-	public static function isInstructionFile($bucket,$key,$client){
-		$meta = $client->getObjectMeta(array("Bucket"=>$bucket,"Key"=>$key));
+	public static function isInstructionFile($s3Object){
+		$meta = $s3Object["Meta"];
 		if(isset($meta["UserMeta"]["x-kss-meta-x-kss-crypto-instr-file"]))
 			return TRUE;
 		return FALSE;
