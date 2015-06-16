@@ -909,11 +909,14 @@ class SDKTest extends PUnit{
         );
         $this->assertEquals(substr($content,$start,$end-$start+1),$s3Object["Content"]);
     }
+    public function test01(){
+        $this->client->listObjects(array("Bucket"=>$this->bucket));
+    }
 }
 $test = new SDKTest();
 $methods = array(
     //"testRangeGetFile",
-    "testPutObjectByContentAndGetObject"
+    "testHeadObjectPresignedUrl"
     );
 $test->run();
 ?>

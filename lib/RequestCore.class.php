@@ -619,7 +619,7 @@ class RequestCore
 		// Verification of the SSL cert
 		if ($this->ssl_verification)
 		{
-			curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, true);
 			curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST, 2);
 		}
 		else
