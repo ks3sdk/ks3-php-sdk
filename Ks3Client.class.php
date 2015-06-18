@@ -132,7 +132,6 @@ class Ks3Client{
 		}
 		if(count($args) !== 0){
 			if(count($args)>1||!is_array($args[0])){
-				var_dump($args);
 				throw new Ks3ClientException("this method only needs one array argument");
 			}
 			$args = $args[0];

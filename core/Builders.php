@@ -7,11 +7,7 @@ class LocationBuilder{
 		if(isset($args["Location"])){
 			$location = $args["Location"];
 			$xml = new SimpleXmlElement('<CreateBucketConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/"></CreateBucketConfiguration>');
-			$location = $args["Location"];
-			if(in_array($location, Consts::$Regions))
-				$xml->addChild("LocationConstraint",$args["Location"]);
-			else
-				throw new Ks3ClientException("unsupport location ".$location);
+			$xml->addChild("LocationConstraint",$args["Location"]);
 			return $xml->asXml();
 		}
 	}
