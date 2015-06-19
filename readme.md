@@ -127,7 +127,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
         [Delimiter] => /
         [MaxKeys] => 4
         [IsTruncated] => true  //true表示返回的结果是全部结果的一部分
-        [NextMarker] => dir/  //如果IsTruncated为true，则可以使用NextMarker作为下一次请求的marker
+        [NextMarker] => dir/  //如果IsTruncated为true，则可以使用NextMarker作为下一次请求的marker.当请求时不提供delimiter的话不会返回NextMarker,可以使用Contents的最后一项作为下一次的Marker
         [Contents] => Array
         (
             [0] => Array
@@ -359,8 +359,9 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
 参数格式: 
 
     $args = array(
-        "Bucket"=>"<您的bucket名称>"，
-        "ACL"=>"private" //配置bucket的访问权限，合法值:private、public-read、public-read-write
+        "Bucket"=>"<您的bucket名称>",
+        "ACL"=>"private", //配置bucket的访问权限，合法值:private、public-read、public-read-write
+        "Location"=>"HANGZHOU"//配置bucket存储地址，默认是杭州。支持HANGZHOU,AMERICA
         )
 
 使用示例: 
