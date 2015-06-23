@@ -49,7 +49,7 @@ class Ks3Request{
 		$this->queryParams[$key] = $value;
 	}
 	public function toUrl($endpoint){
-		$url = $this->scheme;
+		$url = "";
 		$bucket = $this->bucket;
 		$key = $this->key;
 		$subResource = $this->subResource;
@@ -65,6 +65,7 @@ class Ks3Request{
 		if(!empty($key)){
 			$url.="/".Utils::encodeUrl($key);
 		}
+		$url = str_replace("//","/%2F", $url);
 		$queryString = "";
 		if(!empty($subResource)){
 			$queryString.="&".$subResource;
@@ -76,6 +77,7 @@ class Ks3Request{
 		if(!empty($queryString)){
 			$url.="?".$queryString;
 		}
+		$url = $this->scheme.$url;
 		return $url;
 	}
 }
