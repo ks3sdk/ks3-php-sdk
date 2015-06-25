@@ -1,6 +1,5 @@
 <?php
 define("ENCRYPTPTION_STORAGE_MODE","InstructionFile");
-define("KS3_API_VHOST",TRUE);
 require_once "../encryption/EncryptionUtil.php";
 require_once "../Ks3Client.class.php";
 require_once "../Ks3EncryptionClient.class.php";
@@ -9,8 +8,8 @@ require_once "PUnit.php";
 require_once "../lib/RequestCore.class.php";
 class SDKTest extends PUnit{
 	protected $bucket = "php-sdk-test";
-	protected $key = "/tes//t==中/文？";
-	protected $key_copy = "/tes//t==中/文？.copy";
+	protected $key = "test==中/文？";
+	protected $key_copy = "test中/文_copy？";
 	protected $accesskey = "lMQTr0hNlMpB0iOk/i+x";
 	protected $secrectkey = "D4CsYLs75JcWEjbiI22zR3P7kJ/+5B1qdEje7A7I";
 	protected $client;
@@ -18,15 +17,14 @@ class SDKTest extends PUnit{
 	protected $cachedir;
     protected $sseckey;
 	public function __construct(){
-        $endpoint = "kss.ksyun.com";
-		$this->client=new Ks3Client($this->accesskey,$this->secrectkey,$endpoint);
+		$this->client=new Ks3Client($this->accesskey,$this->secrectkey);
 		$this->cachedir=KS3_API_PATH.DIRECTORY_SEPARATOR."unit".DIRECTORY_SEPARATOR."cache".DIRECTORY_SEPARATOR;
         $filename = "secret.key";
         $handle = fopen($filename, "r");
         $sseckey = fread($handle, filesize ($filename));
         fclose($handle);
         $this->sseckey = $sseckey;
-        $this->encryptionClient = new Ks3EncryptionClient($this->accesskey,$this->secrectkey,$sseckey,$endpoint);
+        $this->encryptionClient = new Ks3EncryptionClient($this->accesskey,$this->secrectkey,$sseckey);
 	}
 	public function before(){
 		if($this->client->bucketExists(array("Bucket"=>$this->bucket))){
