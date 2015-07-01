@@ -46,6 +46,12 @@ define("KS3_API_DEBUG_MODE",FALSE);
 ### 4.2 Ks3ClientException
 当抛出Ks3ClientException时表示客户端发送了异常。Ks3ClientException继承自RuntimeException
 ## 5 使用示例
+快速导航：  
+删除文件：5.3.1 5.3.2  
+下载文件：5.3.3  
+判断文件是否存在：5.3.5  
+上传文件：5.3.7  
+分块上传：5.3.12-5.3.17  
 ### 5.1 Service接口
 #### 5.1.1 GET Service
 获取用户的所有bucket列表  
@@ -653,8 +659,8 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
             ),
         "ACL"=>"public-read",//可以设置访问权限,合法值,private、public-read
         "ObjectMeta"=>array(//设置object的元数据,可以设置"Cache-Control","Content-Disposition","Content-Encoding","Content-Length","Content-MD5","Content-Type","Expires"。当设置了Content-Length时，最后上传的为从seek_position开始向后Content-Length个字节的内容。当设置了Content-MD5时，系统会在服务端进行md5校验。
-            "Content-Type"=>"binay/ocet-stream",
-            "Content-Length"=>4
+            "Content-Type"=>"binay/ocet-stream"
+            //"Content-Length"=>4
             ),
         "UserMeta"=>array(//可以设置object的用户元数据，需要以x-kss-meta-开头
             "x-kss-meta-test"=>"test"
