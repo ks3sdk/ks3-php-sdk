@@ -8,7 +8,7 @@ if(!defined("KS3_API_PATH"))
 define("KS3_API_PATH", dirname(__FILE__));
 //是否使用VHOST
 if(!defined("KS3_API_VHOST"))
-define("KS3_API_VHOST",FALSE);
+define("KS3_API_VHOST",TRUE);
 //是否开启日志(写入日志文件)
 if(!defined("KS3_API_LOG"))
 define("KS3_API_LOG",TRUE);

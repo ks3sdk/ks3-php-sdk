@@ -4,7 +4,7 @@
 [TOC]
 
 ## 1 概述
-此SDK适用于PHP 5及以上版本。基于KS3 API 构建。使用此 SDK 构建您的网络应用程序，能让您以非常便捷地方式将数据安全地存储到金山云存储上。无论您的网络应用是一个网站程序，还是包括从云端（服务端程序）到终端（手持设备应用）的架构的服务或应用，通过KS3存储及其 SDK，都能让您应用程序的终端用户高速上传和下载，同时也让您的服务端更加轻盈。  
+此SDK适用于PHP 5及以上版本。基于KS3 API 构建。使用此 SDK 构建您的网络应用程序，能让您以非常便捷地方式将数据安全地存储到金山云存储上。  
 
 
 ## 2 环境准备
@@ -39,6 +39,14 @@ define("KS3_API_DEBUG_MODE",FALSE);
 
     $client = new Ks3Client("<您的AccessKeyID>","<您的AccessKeySecret>");
 
+指定其他ks3节点  
+
+    $client = new Ks3Client("<您的AccessKeyID>","<您的AccessKeySecret>","endpoint")
+
+ks3节点列表  
+中国标准域名:kss.ksyun.com  
+中国标准CDN域名:kssws.ks-cdn.com  
+美国（圣克拉拉）域名:ks3-us-west-1.ksyun.com  
 ## 4 异常说明
 ### 4.1 Ks3ServiceException
 当抛出Ks3ServiceException时表示KS3服务端返回异常信息。Ks3ServiceException继承自RuntimeException 
