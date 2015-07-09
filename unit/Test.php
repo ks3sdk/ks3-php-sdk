@@ -183,7 +183,7 @@ class SDKTest extends PUnit{
 	}
 	public function testObjectAcl(){
 		$this->client->putObjectByContent(array("Bucket"=>$this->bucket,"Key"=>$this->key,
-"Content"=>"1234"));
+"Content"=>"1234","ACL"=>"private"));
 		$this->assertEquals($this->client->getObjectAcl(array("Bucket"=>$this->bucket,"Key"=>$this->key)),"private","object acl");
 		$this->client->setObjectAcl(array("Bucket"=>$this->bucket,"Key"=>$this->key,"ACL"=>"public-read"));
 		$this->assertEquals($this->client->getObjectAcl(array("Bucket"=>$this->bucket,"Key"=>$this->key)),"public-read","object acl");
@@ -916,7 +916,7 @@ class SDKTest extends PUnit{
 $test = new SDKTest();
 $methods = array(
     //"testRangeGetFile",
-    "testHeadObjectPresignedUrl"
+    "testObjectAcl"
     );
 $test->run();
 ?>
