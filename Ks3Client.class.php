@@ -25,7 +25,7 @@ define("KS3_API_USE_HTTPS",FALSE);
 if(!defined("KS3_API_DEBUG_MODE"))
 define("KS3_API_DEBUG_MODE",FALSE);
 define("KS3_API_Author","lijunwei@kingsoft.com");
-define("KS3_API_Version","1.1");
+define("KS3_API_Version","1.2");
 
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."config".DIRECTORY_SEPARATOR."Consts.php";
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."core".DIRECTORY_SEPARATOR."API.php";
