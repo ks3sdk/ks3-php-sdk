@@ -480,7 +480,7 @@ class SSECSourceSigner{
 class AllHeaderSigner{
 	public function sign(Ks3Request $request,$args=array()){
 		$args = $args["args"];
-		$headers = $args["Headers"];
+		$headers = isset($args["Headers"])?$args["Headers"]:"";
 		if(!empty($headers)&&is_array($headers)){
 			foreach ($headers as $key => $value) {
 				$request->addHeader($key,$value);

@@ -65,9 +65,10 @@ class Ks3Client{
 		$this->accessKey = $accessKey;
 		$this->secretKey = $secretKey;
 
-		$this->endpoint = Consts::$Ks3EndPoint;
-		if($endpoint)
-			$this->endpoint = $endpoint;
+		if(empty($endpoint)){
+			throw new Ks3ClientException("must set endpoint, please see http://ks3.ksyun.com/doc/api/index.html Region part");
+		}
+		$this->endpoint = $endpoint;
 
 		$this->signers = array();
 		$this->log = new Logger();
