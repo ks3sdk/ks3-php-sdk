@@ -1,3 +1,7 @@
+V1.2.2
+1、修复某些接口操作成功但返回布尔值不正确的问题，如deleteObject等
+2、更新sample中Ks3Client初始化时用户需要提供endpoint值
+
 V1.2.1
 1、Ks3Client 初始化时用户需要提供endpoint值，详见http://ks3.ksyun.com/doc/api/index.html Region part
 2、修复某些时候会出现Notice警告的bug

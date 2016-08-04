@@ -323,7 +323,7 @@ class AdpHandler implements Handler{
 }
 class BooleanHandler implements Handler{
 	public function handle(ResponseCore $response){
-		if(!$response->isOk()){
+		if($response->isOk()){
 			return TRUE;
 		}else{
 			return FALSE;

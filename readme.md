@@ -37,16 +37,13 @@ define("KS3_API_DEBUG_MODE",FALSE);
 ### 3.4 初始化客户端
 当以上全部完成之后用户便可初始化客户端进行操作了  
 
-    $client = new Ks3Client("<您的AccessKeyID>","<您的AccessKeySecret>");
-
-指定其他ks3节点  
+需要指定ks3节点  
+第三个参数endpoint需要对应bucket所在region!! 详见http://ks3.ksyun.com/doc/api/index.html  Region（区域）一节
 
     $client = new Ks3Client("<您的AccessKeyID>","<您的AccessKeySecret>","endpoint")
 
 ks3节点列表  
-中国标准域名:kss.ksyun.com  
-中国标准CDN域名:kssws.ks-cdn.com  
-美国（圣克拉拉）域名:ks3-us-west-1.ksyun.com  
+详见http://ks3.ksyun.com/doc/api/index.html  Region（区域）一节
 ## 4 异常说明
 ### 4.1 Ks3ServiceException
 当抛出Ks3ServiceException时表示KS3服务端返回异常信息。Ks3ServiceException继承自RuntimeException 
