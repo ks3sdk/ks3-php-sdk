@@ -1,4 +1,6 @@
 <?php
+use App\Thirdparty\Ks3\ResponseCore;
+use App\Thirdparty\Ks3\Ks3ServiceException;
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."exceptions".DIRECTORY_SEPARATOR."Exceptions.php";
 
 interface Handler{

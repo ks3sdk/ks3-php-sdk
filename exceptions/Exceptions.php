@@ -1,5 +1,6 @@
 <?php
-class Ks3ClientException extends RuntimeException{
+namespace App\Thirdparty\Ks3;
+class Ks3ClientException extends \RuntimeException{
 	
 }
 class Ks3ServiceException extends Ks3ClientException{

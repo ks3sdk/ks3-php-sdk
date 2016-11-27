@@ -1,4 +1,5 @@
 <?php
+namespace App\Thirdparty\Ks3;
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."core".DIRECTORY_SEPARATOR."Utils.class.php";
 
 class Ks3Request{
