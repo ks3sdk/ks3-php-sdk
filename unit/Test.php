@@ -10,8 +10,8 @@ class SDKTest extends PUnit{
 	protected $bucket = "php-sdk-test";
 	protected $key = "test==中/文？";
 	protected $key_copy = "test中/文_copy？";
-	protected $accesskey = "lMQTr0hNlMpB0iOk/i+x";
-	protected $secrectkey = "D4CsYLs75JcWEjbiI22zR3P7kJ/+5B1qdEje7A7I";
+	protected $accesskey = "";
+	protected $secrectkey = "";
 	protected $client;
     protected $encryptionClient;
 	protected $cachedir;

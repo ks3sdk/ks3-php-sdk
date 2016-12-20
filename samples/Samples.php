@@ -2,7 +2,7 @@
 require_once "../Ks3Client.class.php";
 require_once "../core/Utils.class.php";
 
-$client = new Ks3Client("2HITWMQXL2VBB3XMAEHQ","ilZQ9p/NHAK1dOYA/dTKKeIqT/t67rO6V2PrXUNr","kss.ksyun.com");//!!第三个参数endpoint需要对应bucket所在region!! 详见http://ks3.ksyun.com/doc/api/index.html  Region（区域）一节
+$client = new Ks3Client("","","kss.ksyun.com");//!!第三个参数endpoint需要对应bucket所在region!! 详见http://ks3.ksyun.com/doc/api/index.html  Region（区域）一节
 //print_r(listBuckets($client));
 //print_r(deleteBucket($client));
 //print_r(deleteBucketCORS($client));

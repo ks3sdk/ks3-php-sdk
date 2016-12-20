@@ -2,7 +2,7 @@
 //更加详细的表单上传请参考js sdk
 require_once "../Ks3Client.class.php";
 
-$client = new Ks3Client("1GL02rRYQxK8s7FQh8dV","2IDjaPOpFfkq5Zf9K4tKu8k5AKApY8S8eKV1zsRl");
+$client = new Ks3Client("","");
 $bucket_name = "phpsdktestlijunwei";
 if(!$client->bucketExists(array("Bucket"=>$bucket_name))){
     $client->createBucket(array("Bucket"=>$bucket_name));
