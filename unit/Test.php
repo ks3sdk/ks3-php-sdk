@@ -286,7 +286,7 @@ class SDKTest extends PUnit{
         $stat = fstat($resource);
         $total = $stat["size"];//获取文件的总大小
         fclose($resource);
-        $count = (int)($total/$partsize+1);//计算文件需要分几块上传
+        $count = (int)(($total-1)/$partsize)+1;;//计算文件需要分几块上传
         for($i = 0;$i < $count;$i++){
             //依次上传每一块
             $args=array(
@@ -854,7 +854,7 @@ class SDKTest extends PUnit{
         $stat = fstat($resource);
         $total = $stat["size"];//获取文件的总大小
         fclose($resource);
-        $count = (int)($total/$partsize+1);//计算文件需要分几块上传
+        $count = (int)(($total-1)/$partsize)+1;//计算文件需要分几块上传
         for($i = 0;$i < $count;$i++){
             //依次上传每一块
             echo "upload".$i."\r\n";

@@ -225,7 +225,7 @@ function multipartUpload($client){
 	}
 	$total = Utils::getFileSize($file);
 	$partsize = 1024*1024*5;
-	$count = (int)($total/$partsize+1);
+	$count = (int)(($total-1)/$partsize)+1;
 	echo $count."\r\n";
 	for($i = 0;$i < $count;$i++){
 		echo "upload".$i."\r\n";
@@ -328,7 +328,7 @@ function  multipartUploadWithAdpAndCallBack($client){
 	}
 	$partsize = 1024*1024*5;
 	$total = Utils::getFileSize($file);
-	$count = (int)($total/$partsize+1);
+	$count = (int)(($total-1)/$partsize)+1;
 	echo $count."\r\n";
 	for($i = 0;$i < $count;$i++){
 		echo "upload".$i."\r\n";
