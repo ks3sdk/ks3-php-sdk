@@ -1145,7 +1145,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
         $stat = fstat($resource);
         $total = $stat["size"];//获取文件的总大小
         fclose($resource);
-        $count = (int)($total/$partsize+1);//计算文件需要分几块上传
+        $count = (int)(($total-1)/$partsize)+1;//计算文件需要分几块上传
         echo $count."\r\n";
         for($i = 0;$i < $count;$i++){
             //依次上传每一块
