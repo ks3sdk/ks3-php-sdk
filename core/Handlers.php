@@ -333,10 +333,21 @@ class BooleanHandler implements Handler{
 class ExistsHandler implements Handler{
 	public function handle(ResponseCore $response){
 		$status = $response->status;
-		if($status === 404){
+		if(in_array($status, array(404,403))){
 			return FALSE;
-		}else{
+		}elseif($status == 200){
 			return TRUE;
+		}else {
+			$exception = new Ks3ServiceException();
+			$exception->statusCode=$status;
+			if(!empty($response->body)){
+				$xml = new SimpleXMLElement($response->body);
+				$exception ->requestId = $xml->RequestId->__toString();
+				$exception->errorCode = $xml->Code->__toString();
+				$exception->errorMessage=$xml->Message->__toString();
+				$exception->resource=$xml->Resource->__toString();
+			}
+			throw $exception;
 		}
 	}
 }
