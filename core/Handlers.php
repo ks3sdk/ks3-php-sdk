@@ -333,7 +333,7 @@ class BooleanHandler implements Handler{
 class ExistsHandler implements Handler{
 	public function handle(ResponseCore $response){
 		$status = $response->status;
-		if($status == 404)){
+		if($status == 404){
 			return FALSE;
 		}elseif($status == 200){
 			return TRUE;
