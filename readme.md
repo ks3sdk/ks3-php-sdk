@@ -683,7 +683,7 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
         [ETag] => "????"
     )
    
-##### 5.3.7.3 上传文件时添加异步数据处理任务
+##### 5.3.7.3 上传文件时添加异步数据处理任务(接口不再支持)
 参数格式:  
 在原有参数的基础上加上如下
 
@@ -767,6 +767,31 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
         "KeyBase64"=>"<主密钥的Base64>",//Key和KeyBase64提供一个即可
         "KeyMD5"=>"<主密钥经Base64编码的MD5值>",//可以不指定，SDK将根据Key计算
         )
+
+##### 5.3.7.7 通过第三方URL拉取文件
+参数格式:
+
+    $content = fopen("<文件路径>", "r");
+    $args = array(
+        "Bucket"=>"<您的bucket名称>",
+        "Key"=>"<key>",
+        "ACL"=>"public-read",//可以设置访问权限,合法值,private、public-read
+        "ObjectMeta"=>array(当设置了Content-MD5时，系统会在服务端进行md5校验。
+            "Content-MD5"=>"",
+            ),
+        "NormalCallBack"=>"<url>",//拉取成功或失败的回调URL，需要进行URLEncode
+        "SourceUrl"=>"<url>"//第三方URL地址，需要进行URLEncode
+        );
+
+使用示例:
+
+    $client->putObjectByFetch ($args);
+
+返回结果格式:
+
+    Array
+    (
+    )
 
 #### 5.3.8 PUT Object acl
 设置object的访问权限  

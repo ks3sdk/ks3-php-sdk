@@ -288,15 +288,6 @@ function putObjectWithAdpAndCallBack($client){
 		"Content"=>array(
 			"content"=>$content
 			),
-		"Adp"=>array(
-			"NotifyURL"=>"http://10.4.2.38:19090/",
-			"Adps"=>array(
-				array(
-					"Command"=>"tag=avop&f=mp4&res=1280x720&vbr=1000k&abr=128k",
-					"Key"=>"野生动物-转码.3gp"
-				)
-			)
-		),
 		"CallBack"=>array(
 			"Url"=>"http://10.4.2.38:19090/",
 			"BodyMagicVariables"=>array("bucket"=>"bucket","key"=>"key"),
