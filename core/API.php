@@ -140,6 +140,14 @@ class API{
 			"signer"=>"DefaultUserAgentSigner->ACLSigner->SuffixContentTypeSigner->ObjectMetaSigner->UserMetaSigner->AdpSigner->CallBackSigner->SSESigner->SSECSigner->StreamUploadSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->UploadHandler"
 		),
+		"putObjectByFetch"=>array(
+			"method"=>"PUT",
+			"needBucket"=>TRUE,
+			"needObject"=>TRUE,
+			"signer"=>"DefaultUserAgentSigner->ACLSigner->SuffixContentTypeSigner->NormalCallBackSigner->SourceUrlSigner->ObjectMetaSigner->HeaderAuthSigner",
+			"subResource"=>"fetch",
+			"handler"=>"ErrorResponseHandler->UploadHandler"
+		),
 		"setObjectAcl"=>array(
 			"method"=>"PUT",
 			"needBucket"=>TRUE,

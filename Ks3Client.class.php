@@ -166,8 +166,7 @@ class Ks3Client{
 			}
 			$request->key = $key;
 		}
-		$method = $api["method"];
-		if($method == "Method"){
+		if($api["method"] == "Method"){
 			if(empty($args["Method"])){
 				$request->method="GET";
 			}else{

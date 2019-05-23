@@ -68,7 +68,7 @@ class HeaderAuthSigner implements Signer{
 		}
 		array_push($signList,$resource);
 		$stringToSign = join("\n",$signList);
-		$log.= $stringToSign;
+		$log.= $stringToSign."\r\n<-stringToSing";
 		$signature = base64_encode(hash_hmac('sha1', $stringToSign, $sk, true));
 
 		$authration.=$ak.":".$signature;
@@ -404,6 +404,26 @@ class CallBackSigner{
 				$request->addHeader(Headers::$XKssCallbackBody,$body);
 			}
 			$request->addHeader(Headers::$XKssCallbackUrl,$url);
+		}
+	}
+}
+class NormalCallBackSigner{
+	public function sign(Ks3Request $request,$args=array()){
+		$args = $args["args"];
+		if(isset($args["NormalCallBack"])){
+			if(empty($args['NormalCallBack']))
+				throw new Ks3ClientException("Url is needed in CallBack");
+			$request->addHeader(Headers::$XKssCallbackUrl,$args['NormalCallBack']);
+		}
+	}
+}
+class SourceUrlSigner{
+	public function sign(Ks3Request $request,$args=array()){
+		$args = $args["args"];
+		if(isset($args["SourceUrl"])){
+			if(empty($args['SourceUrl']))
+				throw new Ks3ClientException("SourceUrl is needed in CallBack");
+			$request->addHeader(Headers::$XKssSourceUrl,$args['SourceUrl']);
 		}
 	}
 }

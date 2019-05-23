@@ -14,6 +14,7 @@ class Headers{
 	static $NotifyURL = "kss-notifyurl";
 	static $XKssCallbackUrl = "x-kss-callbackurl";
 	static $XKssCallbackBody = "x-kss-callbackbody";
+	static $XKssSourceUrl = "x-kss-sourceurl";
 	static $UserAgent = "User-Agent";
 	static $SSEAlgm = "x-kss-server-side-encryption";
 	static $SSEKMSId = "x-kss-server-side-encryption-kss-kms-key-id";
