@@ -771,7 +771,6 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
 ##### 5.3.7.7 通过第三方URL拉取文件
 参数格式:
 
-    $content = fopen("<文件路径>", "r");
     $args = array(
         "Bucket"=>"<您的bucket名称>",
         "Key"=>"<key>",

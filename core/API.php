@@ -160,7 +160,7 @@ class API{
 			"method"=>"PUT",
 			"needBucket"=>TRUE,
 			"needObject"=>TRUE,
-			"signer"=>"DefaultUserAgentSigner->CopySourceSigner->DefaultContentTypeSigner->CallBackSigner->SSESigner->SSECSigner->SSECSourceSigner->HeaderAuthSigner",
+			"signer"=>"DefaultUserAgentSigner->CopySourceSigner->DefaultContentTypeSigner->SSESigner->SSECSigner->SSECSourceSigner->HeaderAuthSigner",
 			"handler"=>"ErrorResponseHandler->CopyHandler"
 		),
 		"getObjectMeta"=>array(
