@@ -682,62 +682,6 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
     (
         [ETag] => "????"
     )
-   
-##### 5.3.7.3 上传文件时添加异步数据处理任务(接口不再支持)
-参数格式:  
-在原有参数的基础上加上如下
-
-    "Adp"=>array(
-		"NotifyURL"=>"<处理完成后KS3服务通知的地址>",
-		"Adps"=>array(
-			array(
-				"Command"=>"tag=avop&f=mp4&res=1280x720&vbr=1000k&abr=128k",//处理命令。具体参考KS3 API文档数据处理，不需要在命令中写tag=saveas&..
-				"Bucket"=>"<处理完成后存在该bucket>",//需要拥有对该bucket写的权限.不提供的话将为数据所在的bucket
-				"Key"=>"<处理完成后存为该key>",//可以不提供，不提供的话将会是随机值。
-			)，
-			//......可以有多条命令
-		)
-	)
-
-比如：
-
-
-    $content = fopen("<文件路径>", "r");
-    $args = array(
-        "Bucket"=>"<您的bucket名称>",
-        "Key"=>"<key>",
-        "Content"=>array(//要上传的内容
-            "content"=>$content,//可以是文件路径或者resource
-            "seek_position"=>0//跳过文件开头?个字节
-        ),
-        "ACL"=>"public-read",//可以设置访问权限,合法值,private、public-read
-        "ObjectMeta"=>array(//设置object的元数据,可以设置"Cache-Control","Content-Disposition","Content-Encoding","Content-Length","Content-MD5","Content-Type","Expires"。当设置了Content-Length时，最后上传的为从seek_position开始向后Content-Length个字节的内容。当设置了Content-MD5时，系统会在服务端进行md5校验。
-            "Content-Type"=>"binay/ocet-stream",
-            "Content-Length"=>4
-        ),
-        "UserMeta"=>array(//可以设置object的用户元数据，需要以x-kss-meta-开头
-            "x-kss-meta-test"=>"test"
-        )
-        "Adp"=>array(
-			"NotifyURL"=>"<处理完成后KS3服务通知的地址>",
-			"Adps"=>array(
-				array(
-					"Command"=>"tag=avop&f=mp4&res=1280x720&vbr=1000k&abr=128k",//处理命令。具体参考KS3 API文档数据处理，不需要在命令中写tag=saveas&..
-					"Bucket"=>"<处理完成后存在该bucket>",//需要拥有对该bucket写的权限.不提供的话将为数据所在的bucket
-					"Key"=>"<处理完成后存为该key>",//可以不提供，不提供的话将会是随机值。
-				)，
-				//......可以有多条命令
-			)
-		)
-    );
-
-返回结果格式:
-
-    Array
-    (
-        [ETag] => "????"
-		[TaskID] => "????"
-    )
 
 ##### 5.3.7.4 上传文件时添加回调
 参数格式:  
@@ -852,48 +796,6 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
         "KeyMD5"=>"<主密钥经Base64编码的MD5值>",//可以不指定，SDK将根据Key计算
         )
 
-#### 5.3.10 PUT Adp
-添加异步数据处理：  
-参数格式:
-
-    $args=array(
-		"Bucket"=>"<数据所在bucket>",
-		"Key"=>"<要处理的数据key>",
-		"Adp"=>array(
-			"NotifyURL"=>"<处理完成后KS3服务通知的地址>",
-			"Adps"=>array(
-				array(
-					"Command"=>"tag=avop&f=mp4&res=1280x720&vbr=1000k&abr=128k",//处理命令。具体参考KS3 API文档数据处理，不需要在命令中写tag=saveas&..
-					"Bucket"=>"<处理完成后存在该bucket>",//需要拥有对该bucket写的权限.不提供的话将为数据所在的bucket
-					"Key"=>"<处理完成后存为该key>",//可以不提供，不提供的话将会是随机值。
-				)，
-				//......可以有多条命令
-			)
-		)
-	);
-
-使用示例:
-
-    $client->putAdp($args);
-
-返回结果格式:
-
-    Array
-	(
-        [TaskID] => 00P7kNjRfJUv
-	)
-
-
-
-#### 5.3.11 GET Adp
-查询数据处理任务  
-参数格式:
-    
-    $args = array("TaskID"=>"<TaskID>");
-
-使用示例:
-
-    $client->getAdp($args);
 
 #### 5.3.12 Initiate Multipart Upload
 ##### 5.3.12.1 基本方式
@@ -1093,28 +995,6 @@ Options中为可选参数，用户需参考KS3 API文档根据实际情况调节
 
     $client->completeMultipartUpload($args);
 
-##### 5.3.15.2 添加异步数据处理任务
-参数格式:  
-在原有参数的基础上加上如下
-
-    "Adp"=>array(
-		"NotifyURL"=>"<处理完成后KS3服务通知的地址>",
-		"Adps"=>array(
-			array(
-				"Command"=>"tag=avop&f=mp4&res=1280x720&vbr=1000k&abr=128k",//处理命令。具体参考KS3 API文档数据处理，不需要在命令中写tag=saveas&..
-				"Bucket"=>"<处理完成后存在该bucket>",//需要拥有对该bucket写的权限.不提供的话将为数据所在的bucket
-				"Key"=>"<处理完成后存为该key>",//可以不提供，不提供的话将会是随机值。
-			)，
-			//......可以有多条命令
-		)
-	)
-
-返回结果格式:
-
-    Array
-    (
-		[TaskID] => "????"
-    )
 
 ##### 5.3.15.3 添加回调
 参数格式:  

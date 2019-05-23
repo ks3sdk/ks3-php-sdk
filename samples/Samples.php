@@ -350,15 +350,6 @@ function  multipartUploadWithAdpAndCallBack($client){
 		"Key"=>"multi.zip",
 		"Options"=>array("uploadId"=>$uploadid),
 		"Parts"=>$parts["Parts"],
-		"Adp"=>array(
-			"NotifyURL"=>"http://10.4.2.38:19090/",
-			"Adps"=>array(
-				array(
-					"Command"=>"tag=avop&f=mp4&res=1280x720&vbr=1000k&abr=128k",
-					"Key"=>"野生动物-转码.3gp"
-				)
-			)
-		),
 		"CallBack"=>array(
 			"Url"=>"http://10.4.2.38:19090/",
 			"BodyMagicVariables"=>array("bucket"=>"bucket","key"=>"key"),
@@ -367,29 +358,6 @@ function  multipartUploadWithAdpAndCallBack($client){
 	);
 	$result = $client->completeMultipartUpload($args);
 	print_r($result);
-	$taskid = $result["TaskID"];
-	$task = $client->getAdp(array("TaskID"=>$taskid));
-	print_r($task);
-}
-function putAdp($client){
-	$args=array(
-		"Bucket"=>"aaphp",
-		"Key"=>"multi.zip",
-		"Adp"=>array(
-			"NotifyURL"=>"http://10.4.2.38:19090/",
-			"Adps"=>array(
-				array(
-					"Command"=>"tag=avop&f=mp4&res=1280x720&vbr=1000k&abr=128k",
-					"Key"=>"野生动物-转码.3gp"
-				)
-			)
-		)
-	);
-	$result = $client->putAdp($args);
-	print_r($result);
-	$taskid = $result["TaskID"];
-	$task = $client->getAdp(array("TaskID"=>$taskid));
-	print_r($task);
 }
 function postObject($client){
 
