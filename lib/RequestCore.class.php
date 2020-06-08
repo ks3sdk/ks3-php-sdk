@@ -1,4 +1,6 @@
 <?php
+namespace App\Thirdparty\Ks3;
+
 
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."encryption".DIRECTORY_SEPARATOR."EncryptionCallBack.php";
 /**
@@ -96,7 +98,7 @@ class RequestCore
 	/**
 	 * The default class to use for HTTP Responses (defaults to <ResponseCore>).
 	 */
-	public $response_class = 'ResponseCore';
+	public $response_class = 'App\Thirdparty\Ks3\ResponseCore';
 
 	/**
 	 * Default useragent string to use.
@@ -1025,4 +1027,4 @@ class ResponseCore
 /**
  * Default RequestCore Exception.
  */
-class RequestCore_Exception extends Exception {}
+class RequestCore_Exception extends \Exception {}

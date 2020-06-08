@@ -1,4 +1,6 @@
 <?php
+use App\Thirdparty\Ks3\Ks3Request;
+use App\Thirdparty\Ks3\Headers;
 
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."core".DIRECTORY_SEPARATOR."Headers.php";
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."core".DIRECTORY_SEPARATOR."Utils.class.php";

@@ -7,6 +7,7 @@ needObject：是否需要object
 signer：请求构造链
 handler：结果处理链
 */
+namespace App\Thirdparty\Ks3;
 class API{
 	public static $API = array(
 		"getService"=>array(

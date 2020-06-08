@@ -1,4 +1,5 @@
 <?php
+namespace App\Thirdparty\Ks3;
 require_once KS3_API_PATH.DIRECTORY_SEPARATOR."exceptions".DIRECTORY_SEPARATOR."Exceptions.php";
 
 class Utils{

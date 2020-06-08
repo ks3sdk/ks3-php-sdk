@@ -1,4 +1,5 @@
 <?php
+namespace App\Thirdparty\Ks3;
 class Headers{
 	static $Date = "Date";
 	static $Authorization = "Authorization";
