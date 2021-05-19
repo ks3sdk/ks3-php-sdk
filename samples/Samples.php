@@ -24,7 +24,8 @@ $client = new Ks3Client("","","kss.ksyun.com");//!!第三个参数endpoint需要
 //print_r(getObjectMeta($client));
 //print_r(setObjectAcl($client));
 //print_r(copyObject($client));
-print_r(putObjectByFile($client));
+// print_r(putObjectByFile($client));
+print_r(renameObject($client));
 //print_r(multipartUpload($client));
 //print_r(abortMultipartUpload($client));
 //print_r(generatePresignedUrl($client));
@@ -181,6 +182,18 @@ function copyObject($client){
 			)
 		);
 	return $client->copyObject($args);
+}
+function renameObject($client){
+	$args = array(
+		"Bucket"=>"vision-resource",
+		"Key"=>"105/416671Prometheus4.png",
+		"newKey"=>"105/416671Prometheus6.png"
+        // "CopySource"=>array(
+		// 	"Bucket"=>"vision-resource",
+		// 	"Key"=>"105/416671Prometheus.png"
+		// )
+    );
+	return $client->renameObject($args);
 }
 function putObjectByFile($client){
 	$file = "D://phpput";

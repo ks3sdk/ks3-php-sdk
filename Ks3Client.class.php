@@ -93,6 +93,7 @@ class Ks3Client{
 	putObjectByFile,上传文件
 	setObjectAcl，设置object访问权限
 	copyObject,复制object
+	renameObject,修改object名称
 	getObjectMeta，获取object元数据
 	objectExists，判断object是否存在
 	deleteObject，删除object
@@ -364,6 +365,25 @@ class Ks3Client{
 		$result["Signature"] = $signature;
 		$result["KSSAccessKeyId"] = $this->accessKey;
 		return $result;
+	}
+
+    public function renameObject($args=array()){
+		    print_r($this->copyObject(array(
+                "Bucket"=>$args["Bucket"],
+		        "Key"=>$args["newKey"],
+                "CopySource"=>array(
+                    "Bucket"=>$args["Bucket"],
+                    "Key"=>$args["Key"]
+                )
+                )
+                ));
+            print_r("after copy succeed");
+
+		    $this->deleteObject(array(
+            "Bucket"=>$args["Bucket"],
+		    "Key"=>$args["Key"]
+            ));
+       
 	}
 }
 

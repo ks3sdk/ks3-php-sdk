@@ -4,10 +4,15 @@ require_once "../Ks3EncryptionClient.class.php";
 require_once "../Ks3Client.class.php";
 $bucket = "test-encryption";
 $keyprefix = "php/";
+$key = "test1.txt";
+$newkey = "test2.txt";
 
 $filename = "secret.key";
+//只读打开文件
 $handle = fopen($filename, "r");
+//读取整个文件
 $contents = fread($handle, filesize ($filename));
+//关闭当前打开文件
 fclose($handle);
 
 $client = new Ks3EncryptionClient("lMQTr0hNlMpB0iOk/i+x","D4CsYLs75JcWEjbiI22zR3P7kJ/+5B1qdEje7A7I",$contents);
@@ -15,6 +20,8 @@ putObjectByContentAndGetObjectUsingInstruction($client,$bucket,$keyprefix);
 putObjectByFileAndGetObjectUsingFile($client,$bucket,$keyprefix);
 multipartUpload($client,$bucket,$keyprefix);
 copyAnddeleteObject($client,$bucket,$keyprefix);
+renameObject($client,$bucket,$key,$newkey);
+
 
 function putObjectByContentAndGetObjectUsingInstruction($client,$bucket,$keyprefix){
 	$content = EncryptionUtil::genereateOnceUsedKey(rand(100,1000));
@@ -27,6 +34,22 @@ function putObjectByContentAndGetObjectUsingInstruction($client,$bucket,$keypref
 	$client->putObjectByContent($args);
 	rangeGetAndCheckMd5($client,$bucket,$keyprefix."EOFile",
 			"D://testdown/down",base64_encode(md5($args["Content"])));
+}
+function renameObject($client,$bucket,$key,$newkey){
+    $copyReq = array(
+		"Bucket"=>$bucket,
+		"Key"=>$key,
+		"CopySource"=>array(
+			"Bucket"=>$bucket,
+			"Key"=>$newkey
+			)
+		);
+	$client->copyObject($copyReq);
+    $deleteReq = array(
+        "Bucket"=>$bucket,
+        "Key"=>$key
+    );
+	$client->deleteObject($deleteReq);
 }
 function putObjectByFileAndGetObjectUsingFile($client,$bucket,$keyprefix){
 

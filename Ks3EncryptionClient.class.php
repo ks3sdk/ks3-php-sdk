@@ -124,6 +124,24 @@ class Ks3EncryptionClient extends Ks3Client{
 		}
 		return parent::copyObject($args);
 	}
+
+    public function renameObject($args=array()){
+		print_r(parent::copyObject(array(
+            "Bucket"=>$args["Bucket"],
+		    "Key"=>$args["newKey"],
+            "CopySource"=>array(
+                "Bucket"=>$args["Bucket"],
+                "Key"=>$args["Key"]
+                )
+            )
+        ));
+        print_r("after copy succeed");
+		$ks3client->deleteObject(array(
+            "Bucket"=>$args["Bucket"],
+		    "Key"=>$args["Key"]
+        ));
+		// return parent::renameObject($args);
+	}
 }
 
 ?>
